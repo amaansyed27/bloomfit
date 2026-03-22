@@ -1,0 +1,113 @@
+# --------------------------------------------------------------------------
+# MISCELLANEOUS
+# --------------------------------------------------------------------------
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+*.bak
+*.tmp
+*.temp
+
+# --------------------------------------------------------------------------
+# IDE RELATED
+# --------------------------------------------------------------------------
+# IntelliJ/Android Studio
+*.iml
+*.ipr
+*.iws
+.idea/
+cmake-build-*/
+# VS Code
+.vscode/
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+*.code-workspace
+
+# --------------------------------------------------------------------------
+# FLUTTER/DART/PUB RELATED
+# --------------------------------------------------------------------------
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+pubspec.lock
+
+# --------------------------------------------------------------------------
+# ANDROID RELATED
+# --------------------------------------------------------------------------
+/android/app/debug
+/android/app/profile
+/android/app/release
+/android/local.properties
+/android/key.properties
+/android/app/**/google-services.json
+*.keystore
+*.jks
+
+# --------------------------------------------------------------------------
+# IOS RELATED
+# --------------------------------------------------------------------------
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Flutter/App.framework
+**/ios/Flutter/App.podspec
+**/ios/Flutter/App.structurerep
+**/ios/Pods/
+**/ios/.ls_build_id
+**/ios/ServiceAccount.json
+**/ios/Runner/GoogleService-Info.plist
+
+# --------------------------------------------------------------------------
+# WEB RELATED
+# --------------------------------------------------------------------------
+lib/generated_plugin_registrant.dart
+
+# --------------------------------------------------------------------------
+# WINDOWS/MACOS/LINUX RELATED
+# --------------------------------------------------------------------------
+# Windows
+/windows/flutter/ephemeral/
+/windows/CMakeCache.txt
+/windows/CMakeFiles/
+/windows/CMakeLists.txt.user
+/windows/Runner.vcxproj.user
+
+# macOS
+/macos/Flutter/ephemeral/
+/macos/CMakeCache.txt
+/macos/CMakeFiles/
+/macos/CMakeLists.txt.user
+
+# Linux
+/linux/flutter/ephemeral/
+/linux/CMakeCache.txt
+/linux/CMakeFiles/
+/linux/CMakeLists.txt.user
+
+# --------------------------------------------------------------------------
+# SYMBOLICATION/OBFUSCATION
+# --------------------------------------------------------------------------
+app.*.symbols
+app.*.map.json
+
+# --------------------------------------------------------------------------
+# CUSTOM PROJECT FILES
+# --------------------------------------------------------------------------
+firebaseAILogic.txt
+key_output.txt
+analysis.log
