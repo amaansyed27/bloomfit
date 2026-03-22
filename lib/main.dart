@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/theme/app_theme.dart';
 import 'features/authentication/data/auth_repository.dart';
 import 'features/authentication/presentation/pages/welcome_screen.dart';
@@ -11,6 +12,10 @@ import 'features/workouts/data/seed_exercises_large.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Load environment variables
+  await dotenv.load(fileName: ".env");
+  
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Seed the database if needed (auto-checks for existing data)
