@@ -111,3 +111,6 @@ app.*.map.json
 firebaseAILogic.txt
 key_output.txt
 analysis.log
+
+#env
+.env
