@@ -147,12 +147,28 @@ function App() {
 
           <div className="mt-6 pointer-events-auto bg-slate-800/80 backdrop-blur-md border border-slate-700 p-4 rounded-xl shadow-xl w-72">
             {liveExercise ? (
-              <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2 text-emerald-400">
                   <Smartphone size={18} className="animate-pulse" />
                   <span className="font-semibold text-sm">Phone Connected</span>
                 </div>
                 <h2 className="text-2xl font-bold text-white">{liveExercise.exerciseName}</h2>
+                
+                {/* INSTRUCTIONS */}
+                {liveExercise.instructions && liveExercise.instructions.length > 0 && (
+                  <div className="mt-2 mb-2 p-3 bg-slate-800/50 rounded-lg border border-slate-700 max-h-32 overflow-y-auto">
+                    <h3 className="text-xs uppercase text-slate-400 mb-2 font-semibold">How to perform:</h3>
+                    <ul className="space-y-2 text-sm text-slate-300">
+                      {liveExercise.instructions.map((inst: string, idx: number) => (
+                        <li key={idx} className="flex gap-2 leading-tight">
+                          <span className="text-emerald-500 font-bold shrink-0">{idx + 1}.</span>
+                          <span>{inst}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 <div className="flex justify-between text-slate-300">
                   <span>Target Reps: <strong className="text-white">{liveExercise.targetReps}</strong></span>
                   <span>Duration: <strong className="text-white">{liveExercise.targetDuration}s</strong></span>

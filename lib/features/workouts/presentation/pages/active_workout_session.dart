@@ -6,6 +6,7 @@ import 'package:bloomfit/features/home/domain/workout_activity.dart';
 import 'workout_appraisal_screen.dart';
 import '../../data/web_companion_provider.dart';
 import '../../data/web_companion_service.dart';
+import 'package:model_viewer_plus/model_viewer_plus.dart';
 
 class ActiveWorkoutSession extends ConsumerStatefulWidget {
   final List<WorkoutActivity> activities;
@@ -22,7 +23,8 @@ class ActiveWorkoutSession extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ActiveWorkoutSession> createState() => _ActiveWorkoutSessionState();
+  ConsumerState<ActiveWorkoutSession> createState() =>
+      _ActiveWorkoutSessionState();
 }
 
 class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
@@ -48,6 +50,21 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
   int _liveReps = 0;
   String _liveFeedback = "";
 
+  String _getGlbPathForExercise(String exerciseName) {
+    final name = exerciseName.toLowerCase();
+    if (name.contains('squat')) return 'assets/models/squats.glb';
+    if (name.contains('jump')) return 'assets/models/jumping_jacks.glb';
+    if (name.contains('push')) return 'assets/models/pushup.glb';
+    if (name.contains('plank')) return 'assets/models/plank.glb';
+    if (name.contains('curl')) return 'assets/models/bicep_curl.glb';
+    if (name.contains('sit') || name.contains('crunch'))
+      return 'assets/models/sit_up.glb';
+    if (name.contains('knee') || name.contains('run'))
+      return 'assets/models/running.glb';
+    if (name.contains('burpee')) return 'assets/models/burpee.glb';
+    return 'assets/models/cheer.glb'; // Fallback
+  }
+
   @override
   void initState() {
     super.initState();
@@ -60,33 +77,36 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
   void _startCompanionListener() {
     final sessionId = ref.read(webCompanionSessionProvider);
     if (sessionId != null) {
-      _companionSubscription = ref.read(webCompanionServiceProvider).listenToSession(sessionId).listen((doc) {
-        if (doc.exists && doc.data() != null) {
-          final data = doc.data() as Map<String, dynamic>;
-          final reps = data['currentReps'] ?? 0;
-          final feedback = data['formFeedback'] ?? "";
-          
-          if (reps != _liveReps || feedback != _liveFeedback) {
-            setState(() {
-              _liveReps = reps;
-              _liveFeedback = feedback;
-            });
-            
-            // Auto complete sets based on reps
-            final activity = widget.activities[_currentExerciseIndex];
-            final targetReps = activity.reps ?? 12;
-            if (_liveReps > 0 && targetReps > 0) {
-               // Calculate how many full sets are completed
-               int completedSetsCount = _liveReps ~/ targetReps;
-               setState(() {
-                 for(int i = 0; i < _completedSets.length; i++) {
-                   _completedSets[i] = i < completedSetsCount;
-                 }
-               });
+      _companionSubscription = ref
+          .read(webCompanionServiceProvider)
+          .listenToSession(sessionId)
+          .listen((doc) {
+            if (doc.exists && doc.data() != null) {
+              final data = doc.data() as Map<String, dynamic>;
+              final reps = data['currentReps'] ?? 0;
+              final feedback = data['formFeedback'] ?? "";
+
+              if (reps != _liveReps || feedback != _liveFeedback) {
+                setState(() {
+                  _liveReps = reps;
+                  _liveFeedback = feedback;
+                });
+
+                // Auto complete sets based on reps
+                final activity = widget.activities[_currentExerciseIndex];
+                final targetReps = activity.reps ?? 12;
+                if (_liveReps > 0 && targetReps > 0) {
+                  // Calculate how many full sets are completed
+                  int completedSetsCount = _liveReps ~/ targetReps;
+                  setState(() {
+                    for (int i = 0; i < _completedSets.length; i++) {
+                      _completedSets[i] = i < completedSetsCount;
+                    }
+                  });
+                }
+              }
             }
-          }
-        }
-      });
+          });
     }
   }
 
@@ -117,7 +137,9 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
           equipment: '',
         ),
       );
-      ref.read(webCompanionServiceProvider).updateLiveSession(sessionId, activity, exercise);
+      ref
+          .read(webCompanionServiceProvider)
+          .updateLiveSession(sessionId, activity, exercise);
     }
   }
 
@@ -158,7 +180,9 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
   }
 
   bool get _isCurrentExerciseComplete {
-    if (_isExerciseTimerRunning || _remainingSeconds > 0 && widget.activities[_currentExerciseIndex].durationSeconds != null) {
+    if (_isExerciseTimerRunning ||
+        _remainingSeconds > 0 &&
+            widget.activities[_currentExerciseIndex].durationSeconds != null) {
       // If duration based, timer must be 0
       return _remainingSeconds == 0;
     } else {
@@ -182,9 +206,15 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Skip Exercise", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                const Text(
+                  "Skip Exercise",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 8),
-                const Text("Why are you skipping this exercise?", style: TextStyle(color: Colors.grey)),
+                const Text(
+                  "Why are you skipping this exercise?",
+                  style: TextStyle(color: Colors.grey),
+                ),
                 const SizedBox(height: 24),
                 _buildSkipReasonTile("Too Heavy"),
                 _buildSkipReasonTile("Too Tired"),
@@ -194,7 +224,7 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
             ),
           ),
         );
-      }
+      },
     );
   }
 
@@ -202,7 +232,11 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       title: Text(reason, style: const TextStyle(fontWeight: FontWeight.w600)),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+      trailing: const Icon(
+        Icons.arrow_forward_ios,
+        size: 16,
+        color: Colors.grey,
+      ),
       onTap: () {
         Navigator.pop(context); // Close bottom sheet
         _processSkip(reason);
@@ -214,7 +248,15 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
     final activity = widget.activities[_currentExerciseIndex];
     final exercise = widget.allExercises.firstWhere(
       (e) => e.id == activity.exerciseId,
-      orElse: () => ExerciseModel(id: '?', name: 'Unknown', bodyPart: '', difficulty: '', instructions: [], imageUrl: '', equipment: ''),
+      orElse: () => ExerciseModel(
+        id: '?',
+        name: 'Unknown',
+        bodyPart: '',
+        difficulty: '',
+        instructions: [],
+        imageUrl: '',
+        equipment: '',
+      ),
     );
 
     // Save as skipped
@@ -245,10 +287,10 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
 
   void _nextExercise() {
     if (!_isCurrentExerciseComplete) {
-       ScaffoldMessenger.of(context).showSnackBar(
-         const SnackBar(content: Text("Complete all sets before moving on!"))
-       );
-       return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Complete all sets before moving on!")),
+      );
+      return;
     }
 
     final activity = widget.activities[_currentExerciseIndex];
@@ -284,7 +326,7 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
   void _showRestOverlay({bool isBetweenSets = false}) {
     int restSeconds = 30; // Default 30 seconds
     Timer? restTimer;
-    
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -292,28 +334,46 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
             if (restTimer == null) {
-               restTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-                  if (restSeconds > 0) {
-                     setStateDialog(() { restSeconds--; });
-                  } else {
-                     timer.cancel();
-                     if (context.mounted) Navigator.pop(context); // Close dialog
-                  }
-               });
+              restTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+                if (restSeconds > 0) {
+                  setStateDialog(() {
+                    restSeconds--;
+                  });
+                } else {
+                  timer.cancel();
+                  if (context.mounted) Navigator.pop(context); // Close dialog
+                }
+              });
             }
 
             return AlertDialog(
               backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-              title: const Text("Take a Rest", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              title: const Text(
+                "Take a Rest",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(_formatTime(restSeconds), style: const TextStyle(fontSize: 64, fontWeight: FontWeight.bold, fontFamily: 'monospace', color: Color(0xFFFF6B6B))),
+                  Text(
+                    _formatTime(restSeconds),
+                    style: const TextStyle(
+                      fontSize: 64,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'monospace',
+                      color: Color(0xFFFF6B6B),
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: () {
-                       setStateDialog(() { restSeconds += 30; });
+                      setStateDialog(() {
+                        restSeconds += 30;
+                      });
                     },
                     icon: const Icon(Icons.add),
                     label: const Text("Add 30s"),
@@ -324,29 +384,32 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
               actions: [
                 TextButton(
                   onPressed: () {
-                     restTimer?.cancel();
-                     Navigator.pop(context);
+                    restTimer?.cancel();
+                    Navigator.pop(context);
                   },
-                  child: const Text("Skip Rest", style: TextStyle(color: Colors.grey, fontSize: 16)),
-                )
+                  child: const Text(
+                    "Skip Rest",
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                  ),
+                ),
               ],
             );
-          }
+          },
+        );
+      },
+    ).then((_) {
+      // When dialog closes (timer finished or skipped), move to next exercise IF not between sets
+      restTimer?.cancel();
+      if (mounted && !isBetweenSets) {
+        setState(() {
+          _currentExerciseIndex++;
+          _initCurrentActivity();
+        });
+        _pageController.nextPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
         );
       }
-    ).then((_) {
-       // When dialog closes (timer finished or skipped), move to next exercise IF not between sets
-       restTimer?.cancel();
-       if (mounted && !isBetweenSets) {
-         setState(() {
-           _currentExerciseIndex++;
-           _initCurrentActivity();
-         });
-         _pageController.nextPage(
-           duration: const Duration(milliseconds: 300),
-           curve: Curves.easeInOut,
-         );
-       }
     });
   }
 
@@ -386,7 +449,7 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
           ),
           TextButton(
             onPressed: () {
-               Navigator.pop(context, 'discard');
+              Navigator.pop(context, 'discard');
             },
             child: const Text(
               "Discard (Delete)",
@@ -395,7 +458,7 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
           ),
           TextButton(
             onPressed: () {
-               Navigator.pop(context, 'finish');
+              Navigator.pop(context, 'finish');
             },
             child: const Text("Finish Early (Save)"),
           ),
@@ -538,9 +601,9 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       children: [
-                        // Image / Animation Placeholder
+                        // 3D Model Viewer Placeholder
                         Container(
-                          height: 220,
+                          height: 250,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -552,49 +615,61 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
                                 offset: const Offset(0, 10),
                               ),
                             ],
-                            image: currentExercise.imageUrl.isNotEmpty
-                                ? DecorationImage(
-                                    image: NetworkImage(
-                                      currentExercise.imageUrl,
-                                    ),
-                                    fit: BoxFit.cover,
-                                  )
-                                : null,
                           ),
                           child: Stack(
                             children: [
-                              if (currentExercise.imageUrl.isEmpty)
-                                const Center(
-                                  child: Icon(
-                                    Icons.fitness_center,
-                                    size: 64,
-                                    color: Colors.grey,
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(24),
+                                child: ModelViewer(
+                                  src: _getGlbPathForExercise(
+                                    currentExercise.name,
                                   ),
+                                  alt: currentExercise.name,
+                                  autoPlay: true,
+                                  autoRotate: false,
+                                  cameraControls: true,
+                                  disableZoom: true,
+                                  backgroundColor: Colors.transparent,
                                 ),
+                              ),
                               if (_liveFeedback.isNotEmpty)
                                 Positioned(
                                   bottom: 16,
                                   left: 16,
                                   right: 16,
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                      horizontal: 16,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: Colors.black.withOpacity(0.7),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Row(
                                       children: [
-                                        const Icon(Icons.computer, color: Colors.greenAccent, size: 20),
+                                        const Icon(
+                                          Icons.computer,
+                                          color: Colors.greenAccent,
+                                          size: 20,
+                                        ),
                                         const SizedBox(width: 8),
                                         Expanded(
                                           child: Text(
                                             _liveFeedback,
-                                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
                                         Text(
                                           "$_liveReps",
-                                          style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold, fontSize: 20),
+                                          style: const TextStyle(
+                                            color: Colors.greenAccent,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20,
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -614,6 +689,71 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 8),
+
+                        // INSTRUCTIONS UI
+                        if (currentExercise.instructions.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              top: 8.0,
+                              bottom: 16.0,
+                            ),
+                            child: Container(
+                              height:
+                                  120, // Constrain height so it's scrollable and doesn't push buttons off screen
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              child: ListView.builder(
+                                padding: const EdgeInsets.all(12),
+                                itemCount: currentExercise.instructions.length,
+                                itemBuilder: (context, idx) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 8.0),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                            top: 2,
+                                            right: 10,
+                                          ),
+                                          padding: const EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            color: const Color(
+                                              0xFFFF6B6B,
+                                            ).withOpacity(0.1),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Text(
+                                            "${idx + 1}",
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFFFF6B6B),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            currentExercise.instructions[idx],
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.black87,
+                                              height: 1.4,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+
                         if (activity.notes != null)
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -693,14 +833,16 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
                               ) {
                                 return InkWell(
                                   onTap: () {
-                                    final isCurrentlyChecked = _completedSets[i];
+                                    final isCurrentlyChecked =
+                                        _completedSets[i];
                                     setState(() {
                                       _completedSets[i] = !isCurrentlyChecked;
                                     });
-                                    
+
                                     // If we just checked it (and it's not the last set), trigger a set rest
-                                    if (!isCurrentlyChecked && i < _completedSets.length - 1) {
-                                       _showRestOverlay(isBetweenSets: true);
+                                    if (!isCurrentlyChecked &&
+                                        i < _completedSets.length - 1) {
+                                      _showRestOverlay(isBetweenSets: true);
                                     }
                                   },
                                   borderRadius: BorderRadius.circular(16),
@@ -729,10 +871,17 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
                                         Row(
                                           children: [
                                             Text(
-                                              _getSetProgressText(i, activity.reps ?? 12),
+                                              _getSetProgressText(
+                                                i,
+                                                activity.reps ?? 12,
+                                              ),
                                               style: TextStyle(
-                                                color: _completedSets[i] ? Colors.green[700] : Colors.grey[600],
-                                                fontWeight: _completedSets[i] ? FontWeight.bold : FontWeight.normal,
+                                                color: _completedSets[i]
+                                                    ? Colors.green[700]
+                                                    : Colors.grey[600],
+                                                fontWeight: _completedSets[i]
+                                                    ? FontWeight.bold
+                                                    : FontWeight.normal,
                                               ),
                                             ),
                                             const SizedBox(width: 12),
@@ -770,14 +919,24 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ElevatedButton(
-                  onPressed: _isCurrentExerciseComplete ? _nextExercise : () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Complete all sets to unlock the next exercise."))
-                    );
-                  },
+                  onPressed: _isCurrentExerciseComplete
+                      ? _nextExercise
+                      : () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "Complete all sets to unlock the next exercise.",
+                              ),
+                            ),
+                          );
+                        },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _isCurrentExerciseComplete ? const Color(0xFF212121) : Colors.grey[300],
-                    foregroundColor: _isCurrentExerciseComplete ? Colors.white : Colors.grey[600],
+                    backgroundColor: _isCurrentExerciseComplete
+                        ? const Color(0xFF212121)
+                        : Colors.grey[300],
+                    foregroundColor: _isCurrentExerciseComplete
+                        ? Colors.white
+                        : Colors.grey[600],
                     minimumSize: const Size(double.infinity, 60),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),

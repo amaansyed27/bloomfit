@@ -7,10 +7,15 @@ class WebCompanionService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> updateLiveSession(
-      String sessionId, WorkoutActivity activity, ExerciseModel exercise) async {
+    String sessionId,
+    WorkoutActivity activity,
+    ExerciseModel exercise,
+  ) async {
     await _firestore.collection('live_sessions').doc(sessionId).set({
       'exerciseId': activity.exerciseId,
       'exerciseName': exercise.name,
+      'instructions':
+          exercise.instructions, // Pass instructions for Web Companion
       'targetReps': activity.reps ?? 0,
       'targetDuration': activity.durationSeconds ?? 0,
       'status': 'active',
