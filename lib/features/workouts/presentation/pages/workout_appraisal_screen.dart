@@ -3,17 +3,22 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/workout_history_repository.dart';
 import '../../../authentication/data/user_repository.dart';
+import '../../../home/data/path_generation_service.dart';
+
+import '../../../home/data/path_repository.dart';
 
 class WorkoutAppraisalScreen extends ConsumerStatefulWidget {
   final int durationSeconds;
   final List<Map<String, dynamic>> exerciseData;
   final String workoutName;
+  final String pathNodeId;
 
   const WorkoutAppraisalScreen({
     super.key,
     required this.durationSeconds,
     required this.exerciseData,
     required this.workoutName,
+    required this.pathNodeId,
   });
 
   @override
@@ -26,14 +31,37 @@ class _WorkoutAppraisalScreenState
   late ConfettiController _confettiController;
   double _intensity = 3; // 1-5
   double _breathing = 3; // 1-5
+  int _accuracy = 100;
+  final List<Map<String, dynamic>> _skippedExercises = [];
 
   @override
   void initState() {
     super.initState();
+    _calculateAccuracy();
     _confettiController = ConfettiController(
       duration: const Duration(seconds: 3),
     );
     _confettiController.play();
+  }
+
+  void _calculateAccuracy() {
+    int totalPossibleSets = 0;
+    int completedSets = 0;
+
+    for (var ex in widget.exerciseData) {
+      int tSets = ex['totalSets'] ?? 1; // Default to 1 for duration
+      totalPossibleSets += tSets;
+
+      if (ex['skipped'] == true) {
+         _skippedExercises.add(ex);
+      } else {
+         completedSets += (ex['setsCompleted'] as int? ?? 0);
+      }
+    }
+
+    if (totalPossibleSets > 0) {
+      _accuracy = ((completedSets / totalPossibleSets) * 100).clamp(0, 100).toInt();
+    }
   }
 
   @override
@@ -61,10 +89,32 @@ class _WorkoutAppraisalScreenState
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
-                    Icons.check_circle_outline,
-                    size: 80,
-                    color: Colors.green,
+                  SizedBox(
+                    height: 120,
+                    width: 120,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        CircularProgressIndicator(
+                          value: _accuracy / 100,
+                          strokeWidth: 12,
+                          backgroundColor: Colors.grey[200],
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            _accuracy >= 80 ? Colors.green : Colors.orange,
+                          ),
+                        ),
+                        Center(
+                          child: Text(
+                            "$_accuracy%",
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: _accuracy >= 80 ? Colors.green[700] : Colors.orange[800],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 24),
                   const Text(
@@ -176,12 +226,62 @@ class _WorkoutAppraisalScreenState
                               exerciseData: widget.exerciseData,
                               intensity: _intensity,
                               breathing: _breathing,
+                              accuracy: _accuracy,
+                              isJourneyPath: widget.pathNodeId.isNotEmpty,
                             );
 
-                        // Update User Stats (XP and Streak)
+                        // Calc Fatigue and Proficiency updates
+                        final currentProfile = ref.read(userProfileProvider).value;
+                        Map<String, dynamic> fatigueUpdates = Map.from(currentProfile?.muscleFatigue ?? {});
+                        Map<String, dynamic> proficiencyUpdates = Map.from(currentProfile?.exerciseProficiency ?? {});
+                        
+                        // Decay fatigue slightly
+                        fatigueUpdates.updateAll((key, value) => ((value as num).toDouble() * 0.8).clamp(0.0, 100.0));
+                        
+                        for (var ex in widget.exerciseData) {
+                          if (ex['skipped'] == true) continue;
+                          
+                          // Fatigue increase per body part
+                          String bodyPart = ex['bodyPart'] ?? 'fullBody';
+                          double currentFatigue = (fatigueUpdates[bodyPart] as num?)?.toDouble() ?? 0.0;
+                          fatigueUpdates[bodyPart] = (currentFatigue + 15.0).clamp(0.0, 100.0);
+                          
+                          // Proficiency increase based on sets
+                          String name = ex['name'] ?? 'unknown';
+                          double curProf = (proficiencyUpdates[name] as num?)?.toDouble() ?? 0.0;
+                          proficiencyUpdates[name] = (curProf + ((ex['setsCompleted'] as int? ?? 1) * 2.0)).clamp(0.0, 100.0);
+                        }
+
+                        // Update User Stats
                         await ref
                             .read(userRepositoryProvider)
-                            .updateUserStats(50, 1); // 50 XP, +1 Streak
+                            .updateUserStats(
+                                xpChange: 50, 
+                                muscleFatigueUpdates: fatigueUpdates, 
+                                proficiencyUpdates: proficiencyUpdates,
+                            );
+
+                        // Mark node as complete and unlock next
+                        if (widget.pathNodeId.isNotEmpty) {
+                          final userProfile = ref.read(userProfileProvider).value;
+                          if (userProfile != null) {
+                             await ref.read(pathRepositoryProvider).completeNode(userProfile.uid, widget.pathNodeId);
+                          }
+                        }
+
+                        // ----- Trigger Path Recalculation if needed -----
+                        if (widget.pathNodeId.isNotEmpty) {
+                           final userProfile = ref.read(userProfileProvider).value;
+                           if (userProfile != null) {
+                              // We don't await this so it happens silently in the background
+                              ref.read(pathGenerationServiceProvider).recalculateUpcomingNodes(
+                                userProfile, 
+                                _intensity,
+                                _accuracy,
+                                _skippedExercises,
+                              );
+                           }
+                        }
 
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(

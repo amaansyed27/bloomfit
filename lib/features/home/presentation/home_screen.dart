@@ -3,11 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../authentication/data/auth_repository.dart';
 import '../../authentication/data/user_repository.dart'; // Added for User Stats
 import '../../workouts/presentation/pages/workout_hub_screen.dart';
+import '../../workouts/presentation/pages/active_workout_session.dart';
+import '../../workouts/data/web_companion_provider.dart';
+import '../../workouts/data/web_companion_service.dart';
+import '../../workouts/data/models/exercise_model.dart';
+import '../domain/workout_activity.dart';
 import '../data/path_repository.dart';
 import '../data/path_generation_service.dart';
 import 'widgets/vertical_timeline_path.dart';
 import '../../onboarding/domain/user_profile.dart'; // Added for Enums
 import '../../workouts/data/seed_exercises_large.dart'; // CORRECT IMPORT
+
+import '../data/health_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -45,7 +52,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   DropdownButtonFormField<Goal>(
-                    value: selectedGoal,
+                    initialValue: selectedGoal,
                     decoration: const InputDecoration(labelText: "Goal"),
                     items: Goal.values.map((g) {
                       return DropdownMenuItem(
@@ -59,7 +66,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<ExperienceLevel>(
-                    value: selectedExp,
+                    initialValue: selectedExp,
                     decoration: const InputDecoration(labelText: "Experience"),
                     items: ExperienceLevel.values.map((e) {
                       return DropdownMenuItem(
@@ -91,6 +98,57 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ],
             );
           },
+        );
+      },
+    );
+  }
+
+  void _showWebCompanionDialog() {
+    final TextEditingController codeController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Connect Web Companion"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Enter the 4-digit pairing code from mocap-web running on your laptop."),
+              const SizedBox(height: 16),
+              TextField(
+                controller: codeController,
+                keyboardType: TextInputType.number,
+                maxLength: 4,
+                decoration: InputDecoration(
+                  labelText: "Pairing Code",
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final code = codeController.text.trim();
+                if (code.length == 4) {
+                  // Set connected session provider
+                  ref.read(webCompanionSessionProvider.notifier).setSession(code);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Connected to session $code!")),
+                    );
+                  }
+                }
+              },
+              child: const Text("Connect"),
+            ),
+          ],
         );
       },
     );
@@ -321,9 +379,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildProfileView(String name, int level, int streak, int xp) {
-    return Center(
+    return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.fromLTRB(24.0, 100.0, 24.0, 24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -338,7 +396,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             Text(
-              "Level $level • ${xp} XP",
+              "Level $level • $xp XP",
               style: TextStyle(color: Colors.grey[600]),
             ),
             const SizedBox(height: 32),
@@ -349,6 +407,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               color: Colors.orange,
             ),
             const SizedBox(height: 16),
+            ref.watch(todayStepsProvider).when(
+                  data: (steps) => _ProfileStatCard(
+                    icon: Icons.directions_walk,
+                    label: "Today's Steps",
+                    value: "$steps",
+                    color: Colors.green,
+                  ),
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (_, __) => const SizedBox.shrink(),
+                ),
+            const SizedBox(height: 16),
+            ref.watch(todayCaloriesProvider).when(
+                  data: (cals) => _ProfileStatCard(
+                    icon: Icons.monitor_heart,
+                    label: "Active Calories",
+                    value: "${cals.toStringAsFixed(0)} kcal",
+                    color: Colors.redAccent,
+                  ),
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, __) => const SizedBox.shrink(),
+                ),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -361,7 +440,50 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   icon: const Icon(Icons.edit),
                   label: const Text("Edit Profile"),
                 ),
+                const SizedBox(width: 8),
+                OutlinedButton.icon(
+                  onPressed: () => _showWebCompanionDialog(),
+                  icon: const Icon(Icons.computer),
+                  label: const Text("Web Companion"),
+                ),
               ],
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: () {
+                final code = ref.read(webCompanionSessionProvider);
+                if (code != null) {
+                  final exercise = ExerciseModel(id: "squat_001", name: "Squat (Demo Mode)", bodyPart: "Legs", difficulty: "Easy", instructions: [], imageUrl: "", equipment: "");
+                  final activity = WorkoutActivity(exerciseId: "squat_001", sets: 1, reps: 5, notes: "Demo");
+                  
+                  ref.read(webCompanionServiceProvider).updateLiveSession(
+                    code,
+                    activity,
+                    exercise
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Triggered Squat Demo on Web!")));
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ActiveWorkoutSession(
+                        workoutTitle: "Web Companion Demo",
+                        activities: [activity],
+                        allExercises: [exercise],
+                        pathNodeId: '',
+                      ),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Connect to Web Companion first!")));
+                }
+              },
+              icon: const Icon(Icons.play_circle_filled),
+              label: const Text("Trigger PC Demo"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.purple,
+                foregroundColor: Colors.white,
+              ),
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(

@@ -22,6 +22,8 @@ class UserProfile {
   final int streak;
   final int level;
   final int planDurationMonths;
+  final Map<String, dynamic> muscleFatigue;
+  final Map<String, dynamic> exerciseProficiency;
 
   UserProfile({
     required this.uid,
@@ -41,6 +43,8 @@ class UserProfile {
     this.streak = 0,
     this.level = 1,
     this.planDurationMonths = 1,
+    this.muscleFatigue = const {},
+    this.exerciseProficiency = const {},
   });
 
   Map<String, dynamic> toMap() {
@@ -62,6 +66,8 @@ class UserProfile {
       'streak': streak,
       'level': level,
       'planDurationMonths': planDurationMonths,
+      'muscleFatigue': muscleFatigue,
+      'exerciseProficiency': exerciseProficiency,
     };
   }
 
@@ -88,6 +94,12 @@ class UserProfile {
       streak: map['streak'] ?? 0,
       level: map['level'] ?? 1,
       planDurationMonths: map['planDurationMonths'] ?? 1,
+      muscleFatigue: map['muscleFatigue'] != null 
+          ? Map<String, dynamic>.from(map['muscleFatigue']) 
+          : {},
+      exerciseProficiency: map['exerciseProficiency'] != null 
+          ? Map<String, dynamic>.from(map['exerciseProficiency']) 
+          : {},
     );
   }
 }

@@ -8,12 +8,14 @@ class ActiveWorkoutOverview extends StatelessWidget {
   final List<WorkoutActivity> activities;
   final List<ExerciseModel> allExercises;
   final String workoutTitle;
+  final String pathNodeId;
 
   const ActiveWorkoutOverview({
     super.key,
     required this.activities,
     required this.allExercises,
     required this.workoutTitle,
+    required this.pathNodeId,
   });
 
   @override
@@ -186,6 +188,7 @@ class ActiveWorkoutOverview extends StatelessWidget {
                       activities: activities,
                       allExercises: allExercises,
                       workoutTitle: workoutTitle,
+                      pathNodeId: pathNodeId,
                     ),
                   ),
                 );

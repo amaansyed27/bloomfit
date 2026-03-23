@@ -29,8 +29,9 @@ class PathGenerationService {
 
     final relevant = allExercises.where((e) {
       if (type == NodeType.cardio) return e.bodyPart.toLowerCase() == 'cardio';
-      if (type == NodeType.yoga)
+      if (type == NodeType.yoga) {
         return false; // Assuming no yoga exercises in seed yet
+      }
       return e.bodyPart.toLowerCase() != 'cardio' &&
           e.bodyPart.toLowerCase() !=
               'yoga'; // Strength defaults to everything else
@@ -261,6 +262,129 @@ class PathGenerationService {
       });
     }
     await batch.commit();
+  }
+
+  Future<void> recalculateUpcomingNodes(
+      UserProfile profile, double rpeFeedback, int accuracy, List<Map<String, dynamic>> skippedExercises) async {
+    final userPathRef = _firestore
+        .collection('users')
+        .doc(profile.uid)
+        .collection('path_nodes');
+
+    // Get up to 5 upcoming locked nodes
+    final lockedNodesSnapshot = await userPathRef
+        .where('state', isEqualTo: PathNodeState.locked.name)
+        .orderBy('position')
+        .limit(5)
+        .get();
+
+    if (lockedNodesSnapshot.docs.isEmpty) return;
+
+    final allExercises = await _fetchAllExercises();
+
+    // Reconstruct nodes from snapshot
+    List<Map<String, dynamic>> lockedNodesData = [];
+    for (var doc in lockedNodesSnapshot.docs) {
+      lockedNodesData.add(doc.data());
+    }
+
+    String promptContext = "The user finished with an accuracy score of $accuracy%. RPE feels like $rpeFeedback/5 (1=Too Easy, 5=Extreme). ";
+    if (accuracy < 80 || rpeFeedback >= 4) {
+      promptContext += "Reduce the total number of Sets and Reps across all future exercises by 20-30% to prevent burnout. ";
+    } else if (rpeFeedback <= 2) {
+      promptContext += "The workout was too easy. Increase sets/reps by 10-20%. ";
+    }
+
+    if (skippedExercises.isNotEmpty) {
+      final skipDetails = skippedExercises.map((e) => "'${e['name']}' (Reason: ${e['skipReason']})").join(", ");
+      promptContext += "The user explicitly skipped these exercises: $skipDetails. Completely remove or substitute them with easier regressions.";
+    }
+
+    String upcomingWorkoutsJson = jsonEncode(lockedNodesData);
+
+    final schema = Schema.array(
+      items: Schema.object(
+        properties: {
+          'title': Schema.string(),
+          'type': Schema.enumString(
+            enumValues: ['strength', 'cardio', 'yoga', 'rest'],
+          ),
+          'activities': Schema.array(
+            items: Schema.object(
+              properties: {
+                'exerciseId': Schema.string(),
+                'sets': Schema.integer(),
+                'reps': Schema.integer(),
+                'durationSeconds': Schema.integer(),
+                'notes': Schema.string(),
+              },
+              optionalProperties: ['sets', 'reps', 'durationSeconds', 'notes'],
+            ),
+          ),
+        },
+      ),
+    );
+
+    final model = FirebaseAI.googleAI().generativeModel(
+      model: 'gemini-2.5-flash',
+      generationConfig: GenerationConfig(
+        responseMimeType: 'application/json',
+        responseSchema: schema,
+      ),
+    );
+
+    final prompt = '''
+    Act as an expert fitness coach. $promptContext
+    - Age: ${profile.age}, Weight: ${profile.weight}kg, Goal: ${profile.primaryGoal.name}
+
+    Here are the current upcoming 5 nodes (JSON):
+    $upcomingWorkoutsJson
+
+    Available exercises (ID: Name):
+    ${_formatExerciseList(allExercises)}
+
+    Return the modified 5 nodes matching the schema. Do not change their 'title' or 'type' if they are 'rest'.
+    ''';
+
+    try {
+      final response = await model.generateContent([Content.text(prompt)]);
+      final jsonString = response.text;
+      if (jsonString == null) return;
+
+      final cleanedText = jsonString
+          .replaceAll('```json', '')
+          .replaceAll('```', '')
+          .trim();
+      final List<dynamic> jsonList = jsonDecode(cleanedText);
+
+      final batch = _firestore.batch();
+
+      for (int i = 0; i < jsonList.length && i < lockedNodesData.length; i++) {
+        final item = jsonList[i];
+        final oldDocId = lockedNodesData[i]['id'];
+        
+        List<WorkoutActivity> activities = [];
+        if (item['activities'] != null) {
+          activities = (item['activities'] as List).map((a) {
+            return WorkoutActivity(
+              exerciseId: a['exerciseId'] ?? '',
+              sets: a['sets'],
+              reps: a['reps'],
+              durationSeconds: a['durationSeconds'],
+              notes: a['notes'],
+            );
+          }).where((a) => a.exerciseId.isNotEmpty).toList();
+        }
+
+        batch.update(userPathRef.doc(oldDocId), {
+          'activities': activities.map((a) => a.toJson()).toList(),
+        });
+      }
+      await batch.commit();
+      debugPrint("PathGenerationService: Dynamically recalibrated upcoming nodes.");
+    } catch (e) {
+      debugPrint("PathGenerationService: Recalibration failed: $e");
+    }
   }
 
   Future<void> deletePathForUser(String uid) async {

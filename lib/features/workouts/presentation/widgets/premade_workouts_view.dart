@@ -45,6 +45,7 @@ class PremadeWorkoutsView extends ConsumerWidget {
                         activities: activities,
                         allExercises: allExercises,
                         workoutTitle: workout.title,
+                        pathNodeId: '', // Custom workout, no path node
                       ),
                     ),
                   );

@@ -153,15 +153,16 @@ class VerticalTimelinePath extends ConsumerWidget {
                                   ),
                                 );
                               } else {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => ActiveWorkoutOverview(
-                                      activities: node.activities,
-                                      allExercises: allExercises,
-                                      workoutTitle: node.title,
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => ActiveWorkoutOverview(
+                                        activities: node.activities,
+                                        allExercises: allExercises,
+                                        workoutTitle: node.title,
+                                        pathNodeId: node.id,
+                                      ),
                                     ),
-                                  ),
-                                );
+                                  );
                               }
                             });
                           },

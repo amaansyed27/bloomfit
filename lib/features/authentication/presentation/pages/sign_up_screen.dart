@@ -191,14 +191,14 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           decoration: BoxDecoration(
                             color: const Color(0xFFFF6B6B),
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
                                 color: const Color(
                                   0xFFFF6B6B,
-                                ).withValues(alpha: 0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 6),
+                                ).withValues(alpha: 0.2),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
                               ),
                             ],
                           ),
@@ -206,7 +206,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             child: Text(
                               "Create Account",
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
@@ -237,10 +237,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             border: Border.all(
-                              color: Colors.grey[300]!,
-                              width: 2,
+                              color: Colors.grey[200]!,
+                              width: 1.5,
                             ),
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -251,7 +251,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                 "Sign up with Google",
                                 style: TextStyle(
                                   fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                   color: Colors.black87,
                                 ),
                               ),

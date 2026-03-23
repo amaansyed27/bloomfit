@@ -112,15 +112,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           decoration: BoxDecoration(
                             color: const Color(0xFFFF6B6B), // Coral Red
                             borderRadius: BorderRadius.circular(
-                              16,
+                              12,
                             ), // Match Welcome Screen
                             boxShadow: [
                               BoxShadow(
                                 color: const Color(
                                   0xFFFF6B6B,
-                                ).withValues(alpha: 0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 6),
+                                ).withValues(alpha: 0.2),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
                               ),
                             ],
                           ),
@@ -146,14 +146,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFFF6B6B), // Coral Red
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
                               color: const Color(
                                 0xFFFF6B6B,
-                              ).withValues(alpha: 0.3),
-                              blurRadius: 12,
-                              offset: const Offset(0, 6),
+                              ).withValues(alpha: 0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),

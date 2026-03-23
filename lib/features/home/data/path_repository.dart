@@ -68,6 +68,24 @@ class PathRepository {
     // Since we need UserProfile for generation, we pass it.
     await _generationService.generatePathForUser(userProfile);
   }
+
+  Future<void> completeNode(String uid, String nodeId) async {
+    final pathRef = _firestore.collection('users').doc(uid).collection('path_nodes');
+    
+    // Mark current node as done
+    await pathRef.doc(nodeId).update({'state': 'done'});
+    
+    // Find next locked node and mark it active
+    final nextNodeSnapshot = await pathRef
+        .where('state', isEqualTo: 'locked')
+        .orderBy('position')
+        .limit(1)
+        .get();
+        
+    if (nextNodeSnapshot.docs.isNotEmpty) {
+      await pathRef.doc(nextNodeSnapshot.docs.first.id).update({'state': 'active'});
+    }
+  }
 }
 
 final pathRepositoryProvider = Provider<PathRepository>((ref) {
@@ -111,42 +129,5 @@ final historyCountProvider = StreamProvider<int>((ref) {
 });
 
 final pathNodesProvider = Provider<AsyncValue<List<PathNodeData>>>((ref) {
-  final planAsync = ref.watch(pathPlanProvider);
-  final countAsync = ref.watch(historyCountProvider);
-
-  if (planAsync.isLoading || countAsync.isLoading) {
-    return const AsyncValue.loading();
-  }
-
-  if (planAsync.hasError)
-    return AsyncValue.error(planAsync.error!, planAsync.stackTrace!);
-  if (countAsync.hasError)
-    return AsyncValue.error(countAsync.error!, countAsync.stackTrace!);
-
-  final plan = planAsync.value ?? [];
-  final count = countAsync.value ?? 0;
-
-  // Merge logic: Update states based on count
-  final updatedNodes = plan.map((node) {
-    PathNodeState newState;
-    if (node.position < count) {
-      newState = PathNodeState.done;
-    } else if (node.position == count) {
-      newState = PathNodeState.active;
-    } else {
-      newState = PathNodeState.locked;
-    }
-
-    return PathNodeData(
-      id: node.id,
-      title: node.title,
-      type: node.type,
-      state: newState,
-      position: node.position,
-
-      activities: node.activities,
-    );
-  }).toList();
-
-  return AsyncValue.data(updatedNodes);
+  return ref.watch(pathPlanProvider);
 });

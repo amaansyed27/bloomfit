@@ -93,6 +93,7 @@ class _WorkoutCrafterViewState extends ConsumerState<WorkoutCrafterView> {
                           activities: activities,
                           allExercises: _selectedExercises,
                           workoutTitle: "Custom Workout",
+                          pathNodeId: '', // Custom workout
                         ),
                       ),
                     );
@@ -154,7 +155,7 @@ class _WorkoutCrafterViewState extends ConsumerState<WorkoutCrafterView> {
                     ),
                     Switch(
                       value: _equipmentNeeded,
-                      activeColor: const Color(0xFFFF6B6B),
+                      activeThumbColor: const Color(0xFFFF6B6B),
                       onChanged: (val) {
                         setState(() => _equipmentNeeded = val);
                       },

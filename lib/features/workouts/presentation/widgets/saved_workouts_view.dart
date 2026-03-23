@@ -98,6 +98,7 @@ class SavedWorkoutsView extends ConsumerWidget {
                                 activities: workout.activities,
                                 allExercises: relevantExercises,
                                 workoutTitle: workout.name,
+                                pathNodeId: '', // Custom workout
                               ),
                             ),
                           );

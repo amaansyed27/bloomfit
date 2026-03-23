@@ -14,6 +14,8 @@ class WorkoutHistoryRepository {
     required List<Map<String, dynamic>> exerciseData,
     required double intensity,
     required double breathing,
+    bool isJourneyPath = false,
+    int accuracy = 100,
   }) async {
     final user = _auth.currentUser;
     if (user == null) return;
@@ -29,6 +31,8 @@ class WorkoutHistoryRepository {
       'exerciseData': exerciseData, // Detailed sets/reps
       'intensity': intensity,
       'breathing': breathing,
+      'accuracy': accuracy,
+      'isJourneyPath': isJourneyPath,
       'timestamp': FieldValue.serverTimestamp(),
       'completedAt': DateTime.now().toIso8601String(),
     });

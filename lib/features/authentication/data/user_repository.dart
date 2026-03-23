@@ -21,15 +21,58 @@ class UserRepository {
     });
   }
 
-  Future<void> updateUserStats(int xpChange, int streakChange) async {
+  Future<void> updateUserStats({
+    required int xpChange,
+    Map<String, dynamic>? muscleFatigueUpdates,
+    Map<String, dynamic>? proficiencyUpdates,
+  }) async {
     final user = _auth.currentUser;
     if (user == null) return;
 
-    await _firestore.collection('users').doc(user.uid).update({
-      'xp': FieldValue.increment(xpChange),
-      'streak': FieldValue.increment(
-        streakChange,
-      ), // Logic for streak might need to be smarter later
+    final docRef = _firestore.collection('users').doc(user.uid);
+    
+    await _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(docRef);
+      if (!snapshot.exists) return;
+
+      final data = snapshot.data()!;
+      int currentStreak = data['streak'] ?? 0;
+      Timestamp? lastWorkout = data['lastWorkoutDate'];
+
+      final now = DateTime.now();
+      int newStreak = currentStreak;
+
+      if (lastWorkout != null) {
+        final lastDate = lastWorkout.toDate();
+        final difference = now.difference(lastDate).inDays;
+
+        if (difference == 1) {
+          // Worked out yesterday, increment streak
+          newStreak += 1;
+        } else if (difference > 1) {
+          // Missed a day, reset streak
+          newStreak = 1;
+        }
+        // If difference == 0, they already worked out today. Streak stays same.
+      } else {
+        // First workout ever
+        newStreak = 1;
+      }
+
+      Map<String, dynamic> updates = {
+        'xp': FieldValue.increment(xpChange),
+        'streak': newStreak,
+        'lastWorkoutDate': FieldValue.serverTimestamp(),
+      };
+
+      if (muscleFatigueUpdates != null) {
+        updates['muscleFatigue'] = muscleFatigueUpdates;
+      }
+      if (proficiencyUpdates != null) {
+        updates['exerciseProficiency'] = proficiencyUpdates;
+      }
+
+      transaction.update(docRef, updates);
     });
   }
 

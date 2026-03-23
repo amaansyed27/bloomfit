@@ -132,14 +132,14 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                       height: 56,
                       decoration: BoxDecoration(
                         color: const Color(0xFFFF6B6B),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
                             color: const Color(
                               0xFFFF6B6B,
-                            ).withValues(alpha: 0.3),
-                            blurRadius: 16,
-                            offset: const Offset(0, 8),
+                            ).withValues(alpha: 0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
                           ),
                         ],
                       ),
@@ -147,7 +147,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                         child: Text(
                           "Get Started",
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                             letterSpacing: 0.5,
@@ -178,8 +178,8 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                       height: 56,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        border: Border.all(color: Colors.grey[200]!, width: 2),
-                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.grey[200]!, width: 1.5),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -195,7 +195,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                             "I have an account",
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                               color: Colors.black87,
                             ),
                           ),

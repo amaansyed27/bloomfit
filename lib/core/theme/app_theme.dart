@@ -56,7 +56,7 @@ class AppTheme {
       color: surface,
       elevation: 0, // Flat design with border/shadow handled manually if needed
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(12),
         side: const BorderSide(color: Color(0xFFEEEEEE), width: 1.5),
       ),
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -69,7 +69,7 @@ class AppTheme {
         foregroundColor: Colors.white,
         elevation: 0,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         textStyle: GoogleFonts.outfit(
           fontSize: 16,
           fontWeight: FontWeight.w600,
