@@ -680,230 +680,273 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
                         ),
                         const SizedBox(height: 24),
 
-                        Text(
-                          currentExercise.name,
-                          style: const TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 8),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                Text(
+                                  currentExercise.name,
+                                  style: const TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 8),
 
-                        // INSTRUCTIONS UI
-                        if (currentExercise.instructions.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              top: 8.0,
-                              bottom: 16.0,
-                            ),
-                            child: Container(
-                              height:
-                                  120, // Constrain height so it's scrollable and doesn't push buttons off screen
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: Colors.grey[300]!),
-                              ),
-                              child: ListView.builder(
-                                padding: const EdgeInsets.all(12),
-                                itemCount: currentExercise.instructions.length,
-                                itemBuilder: (context, idx) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 8.0),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                            top: 2,
-                                            right: 10,
-                                          ),
-                                          padding: const EdgeInsets.all(6),
-                                          decoration: BoxDecoration(
-                                            color: const Color(
-                                              0xFFFF6B6B,
-                                            ).withOpacity(0.1),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Text(
-                                            "${idx + 1}",
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: Color(0xFFFF6B6B),
-                                            ),
-                                          ),
+                                // INSTRUCTIONS UI
+                                if (currentExercise.instructions.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 8.0,
+                                      bottom: 16.0,
+                                    ),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[100],
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(
+                                          color: Colors.grey[300]!,
                                         ),
-                                        Expanded(
+                                      ),
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        padding: const EdgeInsets.all(12),
+                                        itemCount:
+                                            currentExercise.instructions.length,
+                                        itemBuilder: (context, idx) {
+                                          return Padding(
+                                            padding: const EdgeInsets.only(
+                                              bottom: 8.0,
+                                            ),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  margin: const EdgeInsets.only(
+                                                    top: 2,
+                                                    right: 10,
+                                                  ),
+                                                  padding: const EdgeInsets.all(
+                                                    6,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(
+                                                      0xFFFF6B6B,
+                                                    ).withOpacity(0.1),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Text(
+                                                    "${idx + 1}",
+                                                    style: const TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Color(0xFFFF6B6B),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    currentExercise
+                                                        .instructions[idx],
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.black87,
+                                                      height: 1.4,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+
+                                if (activity.notes != null)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.amber.withValues(
+                                        alpha: 0.1,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          Icons.lightbulb,
+                                          size: 16,
+                                          color: Colors.amber,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Flexible(
                                           child: Text(
-                                            currentExercise.instructions[idx],
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black87,
-                                              height: 1.4,
+                                            activity.notes!,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.brown[700],
                                             ),
                                           ),
                                         ),
                                       ],
                                     ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
+                                  ),
 
-                        if (activity.notes != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.amber.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.lightbulb,
-                                  size: 16,
-                                  color: Colors.amber,
-                                ),
-                                const SizedBox(width: 8),
-                                Flexible(
-                                  child: Text(
-                                    activity.notes!,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.brown[700],
+                                const SizedBox(height: 24),
+
+                                // Interaction Area
+                                if (isDuration) ...[
+                                  Text(
+                                    _formatTime(_remainingSeconds),
+                                    style: const TextStyle(
+                                      fontSize: 64,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'monospace',
                                     ),
                                   ),
-                                ),
+                                  const SizedBox(height: 16),
+                                  ElevatedButton.icon(
+                                    onPressed: _toggleExerciseTimer,
+                                    icon: Icon(
+                                      _isExerciseTimerRunning
+                                          ? Icons.pause
+                                          : Icons.play_arrow,
+                                    ),
+                                    label: Text(
+                                      _isExerciseTimerRunning
+                                          ? "Pause"
+                                          : "Start",
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFFFF6B6B),
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 40,
+                                        vertical: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ] else ...[
+                                  // Sets List
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(24),
+                                      border: Border.all(
+                                        color: Colors.grey[200]!,
+                                      ),
+                                    ),
+                                    padding: const EdgeInsets.all(8),
+                                    child: Column(
+                                      children: List.generate(
+                                        _completedSets.length,
+                                        (i) {
+                                          return InkWell(
+                                            onTap: () {
+                                              final isCurrentlyChecked =
+                                                  _completedSets[i];
+                                              setState(() {
+                                                _completedSets[i] =
+                                                    !isCurrentlyChecked;
+                                              });
+
+                                              // If we just checked it (and it's not the last set), trigger a set rest
+                                              if (!isCurrentlyChecked &&
+                                                  i <
+                                                      _completedSets.length -
+                                                          1) {
+                                                _showRestOverlay(
+                                                  isBetweenSets: true,
+                                                );
+                                              }
+                                            },
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
+                                            child: Container(
+                                              padding: const EdgeInsets.all(16),
+                                              margin: const EdgeInsets.only(
+                                                bottom: 4,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: _completedSets[i]
+                                                    ? const Color(0xFFE8F5E9)
+                                                    : Colors.transparent,
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "Set ${i + 1}",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: _completedSets[i]
+                                                          ? Colors.green[800]
+                                                          : Colors.grey[800],
+                                                    ),
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Text(
+                                                        _getSetProgressText(
+                                                          i,
+                                                          activity.reps ?? 12,
+                                                        ),
+                                                        style: TextStyle(
+                                                          color:
+                                                              _completedSets[i]
+                                                              ? Colors
+                                                                    .green[700]
+                                                              : Colors
+                                                                    .grey[600],
+                                                          fontWeight:
+                                                              _completedSets[i]
+                                                              ? FontWeight.bold
+                                                              : FontWeight
+                                                                    .normal,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 12),
+                                                      Icon(
+                                                        _completedSets[i]
+                                                            ? Icons.check_circle
+                                                            : Icons
+                                                                  .circle_outlined,
+                                                        color: _completedSets[i]
+                                                            ? Colors.green
+                                                            : Colors.grey[300],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                                const SizedBox(height: 24),
                               ],
                             ),
                           ),
-
-                        const Spacer(),
-
-                        // Interaction Area
-                        if (isDuration) ...[
-                          Text(
-                            _formatTime(_remainingSeconds),
-                            style: const TextStyle(
-                              fontSize: 64,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'monospace',
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          ElevatedButton.icon(
-                            onPressed: _toggleExerciseTimer,
-                            icon: Icon(
-                              _isExerciseTimerRunning
-                                  ? Icons.pause
-                                  : Icons.play_arrow,
-                            ),
-                            label: Text(
-                              _isExerciseTimerRunning ? "Pause" : "Start",
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFF6B6B),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 40,
-                                vertical: 16,
-                              ),
-                            ),
-                          ),
-                        ] else ...[
-                          // Sets List
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(24),
-                              border: Border.all(color: Colors.grey[200]!),
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: Column(
-                              children: List.generate(_completedSets.length, (
-                                i,
-                              ) {
-                                return InkWell(
-                                  onTap: () {
-                                    final isCurrentlyChecked =
-                                        _completedSets[i];
-                                    setState(() {
-                                      _completedSets[i] = !isCurrentlyChecked;
-                                    });
-
-                                    // If we just checked it (and it's not the last set), trigger a set rest
-                                    if (!isCurrentlyChecked &&
-                                        i < _completedSets.length - 1) {
-                                      _showRestOverlay(isBetweenSets: true);
-                                    }
-                                  },
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(16),
-                                    margin: const EdgeInsets.only(bottom: 4),
-                                    decoration: BoxDecoration(
-                                      color: _completedSets[i]
-                                          ? const Color(0xFFE8F5E9)
-                                          : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "Set ${i + 1}",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: _completedSets[i]
-                                                ? Colors.green[800]
-                                                : Colors.grey[800],
-                                          ),
-                                        ),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              _getSetProgressText(
-                                                i,
-                                                activity.reps ?? 12,
-                                              ),
-                                              style: TextStyle(
-                                                color: _completedSets[i]
-                                                    ? Colors.green[700]
-                                                    : Colors.grey[600],
-                                                fontWeight: _completedSets[i]
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            Icon(
-                                              _completedSets[i]
-                                                  ? Icons.check_circle
-                                                  : Icons.circle_outlined,
-                                              color: _completedSets[i]
-                                                  ? Colors.green
-                                                  : Colors.grey[300],
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }),
-                            ),
-                          ),
-                        ],
-                        const Spacer(),
+                        ),
                       ],
                     ),
                   );
