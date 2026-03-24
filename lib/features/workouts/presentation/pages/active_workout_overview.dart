@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/exercise_model.dart';
 import 'package:bloomfit/features/home/domain/workout_activity.dart';
 import 'active_workout_session.dart';
+import '../../data/web_companion_provider.dart';
 
-class ActiveWorkoutOverview extends StatelessWidget {
+class ActiveWorkoutOverview extends ConsumerWidget {
   final List<WorkoutActivity> activities;
   final List<ExerciseModel> allExercises;
   final String workoutTitle;
@@ -18,8 +20,73 @@ class ActiveWorkoutOverview extends StatelessWidget {
     required this.pathNodeId,
   });
 
+  void _showWebCompanionDialog(BuildContext context, WidgetRef ref) {
+    final codeController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.computer, color: Color(0xFFFF6B6B)),
+              SizedBox(width: 8),
+              Text("Web Companion"),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Enter the 4-digit pairing code shown on your Web Companion screen.",
+                style: TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: codeController,
+                keyboardType: TextInputType.number,
+                maxLength: 4,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 24, letterSpacing: 8),
+                decoration: InputDecoration(
+                  hintText: "0000",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final code = codeController.text.trim();
+                if (code.length == 4) {
+                  // Set connected session provider
+                  ref
+                      .read(webCompanionSessionProvider.notifier)
+                      .setSession(code);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Connected to session $code!")),
+                    );
+                  }
+                }
+              },
+              child: const Text("Connect"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     // Calculate total stats
     final exerciseCount = activities.length;
     final totalSets = activities.fold(0, (sum, act) => sum + (act.sets ?? 3));
@@ -29,6 +96,9 @@ class ActiveWorkoutOverview extends StatelessWidget {
       }
       return sum + ((act.sets ?? 3) * 60); // approx 1 min per set
     });
+
+    final currentSessionId = ref.watch(webCompanionSessionProvider);
+    final isConnected = currentSessionId != null;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
@@ -177,9 +247,89 @@ class ActiveWorkoutOverview extends StatelessWidget {
             ),
           ),
 
+          // Web Companion Integration
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: InkWell(
+              onTap: isConnected
+                  ? () {
+                      ref
+                          .read(webCompanionSessionProvider.notifier)
+                          .setSession(null);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Disconnected from Web Companion."),
+                        ),
+                      );
+                    }
+                  : () => _showWebCompanionDialog(context, ref),
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isConnected
+                      ? Colors.teal.withValues(alpha: 0.1)
+                      : Colors.indigo.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isConnected
+                        ? Colors.teal.withValues(alpha: 0.3)
+                        : Colors.indigo.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      isConnected ? Icons.check_circle : Icons.computer,
+                      color: isConnected ? Colors.teal : Colors.indigo,
+                      size: 28,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isConnected
+                                ? "Web Companion Connected"
+                                : "Connect Web Companion",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: isConnected
+                                  ? Colors.teal[800]
+                                  : Colors.indigo[800],
+                            ),
+                          ),
+                          Text(
+                            isConnected
+                                ? "Session ID: $currentSessionId. Tap to disconnect."
+                                : "Tap to sync live with the Mocap Web App",
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: isConnected
+                                  ? Colors.teal[600]
+                                  : Colors.indigo[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16,
+                      color: isConnected ? Colors.teal : Colors.indigo,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
           // Start Button
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
             child: ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pushReplacement(

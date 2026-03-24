@@ -27,9 +27,25 @@ class ActiveWorkoutSession extends ConsumerStatefulWidget {
       _ActiveWorkoutSessionState();
 }
 
+class _WorkoutStep {
+  final WorkoutActivity activity;
+  final ExerciseModel exercise;
+  final int setIndex;
+  final int totalSets;
+  final int originalActivityIndex;
+  _WorkoutStep(
+    this.activity,
+    this.exercise,
+    this.setIndex,
+    this.totalSets,
+    this.originalActivityIndex,
+  );
+}
+
 class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
   late PageController _pageController;
-  int _currentExerciseIndex = 0;
+  List<_WorkoutStep> _steps = [];
+  int _currentStepIndex = 0;
 
   // Workout Timer
   Timer? _workoutTimer;
@@ -37,7 +53,6 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
   bool _isPaused = false;
 
   // Exercise Specific State
-  List<bool> _completedSets = [];
   Timer? _exerciseTimer; // For duration exercises (plank/cardio)
   int _remainingSeconds = 0;
   bool _isExerciseTimerRunning = false;
@@ -50,7 +65,7 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
   int _liveReps = 0;
   String _liveFeedback = "";
 
-  String _getGlbPathForExercise(String exerciseName) {
+  String getGlbPathForExercise(String exerciseName) {
     final name = exerciseName.toLowerCase();
     if (name.contains('squat')) return 'assets/models/squats.glb';
     if (name.contains('jump')) return 'assets/models/jumping_jacks.glb';
@@ -69,9 +84,154 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
   void initState() {
     super.initState();
     _pageController = PageController();
+
+    int maxSets = 0;
+    for (var act in widget.activities) {
+      if ((act.sets ?? 1) > maxSets) {
+        maxSets = act.sets ?? 1;
+      }
+    }
+
+    for (int s = 0; s < maxSets; s++) {
+      for (int i = 0; i < widget.activities.length; i++) {
+        final act = widget.activities[i];
+        int actSets = act.sets ?? 1;
+        if (s < actSets) {
+          final ex = widget.allExercises.firstWhere(
+            (e) => e.id == act.exerciseId,
+            orElse: () => ExerciseModel(
+              id: '?',
+              name: 'Unknown',
+              bodyPart: '',
+              difficulty: '',
+              instructions: [],
+              imageUrl: '',
+              equipment: '',
+            ),
+          );
+          _steps.add(_WorkoutStep(act, ex, s, actSets, i));
+        }
+      }
+    }
+
     _startWorkoutTimer();
     _initCurrentActivity();
     _startCompanionListener();
+  }
+
+  void _showHelpSheet(ExerciseModel ex) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.75,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 12, bottom: 16),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Container(
+                height: 250,
+                width: double.infinity,
+                color: Colors.grey[50],
+                child: ModelViewer(
+                  src: getGlbPathForExercise(ex.name),
+                  alt: ex.name,
+                  autoPlay: true,
+                  autoRotate: true,
+                  cameraControls: true,
+                  disableZoom: true,
+                  backgroundColor: Colors.transparent,
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        ex.name,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      const Text(
+                        "How to perform",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      if (ex.instructions.isEmpty)
+                        const Text(
+                          "No instructions available.",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ...ex.instructions.asMap().entries.map((entry) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  color: const Color(
+                                    0xFFFF6B6B,
+                                  ).withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "${entry.key + 1}",
+                                    style: const TextStyle(
+                                      color: Color(0xFFFF6B6B),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  entry.value,
+                                  style: const TextStyle(height: 1.4),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void _startCompanionListener() {
@@ -91,19 +251,6 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
                   _liveReps = reps;
                   _liveFeedback = feedback;
                 });
-
-                // Auto complete sets based on reps
-                final activity = widget.activities[_currentExerciseIndex];
-                final targetReps = activity.reps ?? 12;
-                if (_liveReps > 0 && targetReps > 0) {
-                  // Calculate how many full sets are completed
-                  int completedSetsCount = _liveReps ~/ targetReps;
-                  setState(() {
-                    for (int i = 0; i < _completedSets.length; i++) {
-                      _completedSets[i] = i < completedSetsCount;
-                    }
-                  });
-                }
               }
             }
           });
@@ -111,9 +258,12 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
   }
 
   void _initCurrentActivity() {
-    final activity = widget.activities[_currentExerciseIndex];
-    final setCounts = activity.sets ?? 3;
-    _completedSets = List.filled(setCounts, false);
+    if (_steps.isEmpty) return;
+    final step = _steps[_currentStepIndex];
+    final activity = step.activity;
+
+    _liveReps = 0;
+    _liveFeedback = "";
 
     // If duration based
     if (activity.durationSeconds != null && activity.durationSeconds! > 0) {
@@ -125,21 +275,9 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
     // Sync with Web Companion
     final sessionId = ref.read(webCompanionSessionProvider);
     if (sessionId != null) {
-      final exercise = widget.allExercises.firstWhere(
-        (e) => e.id == activity.exerciseId,
-        orElse: () => ExerciseModel(
-          id: '?',
-          name: 'Unknown',
-          bodyPart: '',
-          difficulty: '',
-          instructions: [],
-          imageUrl: '',
-          equipment: '',
-        ),
-      );
       ref
           .read(webCompanionServiceProvider)
-          .updateLiveSession(sessionId, activity, exercise);
+          .updateLiveSession(sessionId, activity, step.exercise);
     }
   }
 
@@ -165,12 +303,6 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
         } else {
           t.cancel();
           _isExerciseTimerRunning = false;
-          // Auto-complete first set if it's a duration exercise
-          if (_completedSets.isNotEmpty) {
-            setState(() {
-              _completedSets[0] = true;
-            });
-          }
         }
       });
     }
@@ -180,14 +312,17 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
   }
 
   bool get _isCurrentExerciseComplete {
+    if (_steps.isEmpty) return true;
+    final step = _steps[_currentStepIndex];
     if (_isExerciseTimerRunning ||
-        _remainingSeconds > 0 &&
-            widget.activities[_currentExerciseIndex].durationSeconds != null) {
+        (_remainingSeconds > 0 &&
+            step.activity.durationSeconds != null &&
+            step.activity.durationSeconds! > 0)) {
       // If duration based, timer must be 0
       return _remainingSeconds == 0;
     } else {
-      // If reps based, all sets must be checked
-      return !_completedSets.contains(false);
+      // If reps based, single set is done manually by pressing Next
+      return true;
     }
   }
 
@@ -245,35 +380,26 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
   }
 
   void _processSkip(String reason) {
-    final activity = widget.activities[_currentExerciseIndex];
-    final exercise = widget.allExercises.firstWhere(
-      (e) => e.id == activity.exerciseId,
-      orElse: () => ExerciseModel(
-        id: '?',
-        name: 'Unknown',
-        bodyPart: '',
-        difficulty: '',
-        instructions: [],
-        imageUrl: '',
-        equipment: '',
-      ),
-    );
+    if (_steps.isEmpty) return;
+    final step = _steps[_currentStepIndex];
+    final activity = step.activity;
+    final exercise = step.exercise;
 
     // Save as skipped
     _completedSessionData.add({
       'exerciseId': activity.exerciseId,
       'name': exercise.name,
       'setsCompleted': 0,
-      'totalSets': _completedSets.length, // or 1 if duration
+      'totalSets': 1, // Single flattened set
       'skipped': true,
       'skipReason': reason,
       'notes': activity.notes,
     });
 
-    if (_currentExerciseIndex < widget.activities.length - 1) {
+    if (_currentStepIndex < _steps.length - 1) {
       // Don't show rest overlay if skipping, just move on
       setState(() {
-        _currentExerciseIndex++;
+        _currentStepIndex++;
         _initCurrentActivity();
       });
       _pageController.nextPage(
@@ -293,30 +419,21 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
       return;
     }
 
-    final activity = widget.activities[_currentExerciseIndex];
-    final exercise = widget.allExercises.firstWhere(
-      (e) => e.id == activity.exerciseId,
-      orElse: () => ExerciseModel(
-        id: '?',
-        name: 'Unknown',
-        bodyPart: '',
-        difficulty: '',
-        instructions: [],
-        imageUrl: '',
-        equipment: '',
-      ),
-    );
+    if (_steps.isEmpty) return;
+    final step = _steps[_currentStepIndex];
+    final activity = step.activity;
+    final exercise = step.exercise;
 
     // Save data
     _completedSessionData.add({
       'exerciseId': activity.exerciseId,
       'name': exercise.name,
-      'setsCompleted': _completedSets.where((s) => s).length,
-      'totalSets': _completedSets.length,
+      'setsCompleted': 1,
+      'totalSets': 1,
       'notes': activity.notes,
     });
 
-    if (_currentExerciseIndex < widget.activities.length - 1) {
+    if (_currentStepIndex < _steps.length - 1) {
       _showRestOverlay();
     } else {
       _finishWorkout();
@@ -402,7 +519,7 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
       restTimer?.cancel();
       if (mounted && !isBetweenSets) {
         setState(() {
-          _currentExerciseIndex++;
+          _currentStepIndex++;
           _initCurrentActivity();
         });
         _pageController.nextPage(
@@ -483,17 +600,11 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
     return "$minutes:$secs";
   }
 
-  String _getSetProgressText(int setIndex, int targetReps) {
+  String _getSetProgressText(int targetReps) {
     if (_liveReps > 0 && targetReps > 0) {
-      int completedSetsCount = _liveReps ~/ targetReps;
-      if (setIndex < completedSetsCount) {
-        return "$targetReps / $targetReps reps";
-      } else if (setIndex == completedSetsCount) {
-        int activeReps = _liveReps % targetReps;
-        return "$activeReps / $targetReps reps";
-      } else {
-        return "0 / $targetReps reps";
-      }
+      int activeReps = _liveReps;
+      if (activeReps > targetReps) activeReps = targetReps;
+      return "$activeReps / $targetReps reps";
     }
     return "$targetReps reps";
   }
@@ -509,23 +620,14 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
 
   @override
   Widget build(BuildContext context) {
-    final totalSteps = widget.activities.length;
-    final activity = widget.activities[_currentExerciseIndex];
+    if (_steps.isEmpty)
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    final totalSteps = _steps.length;
+    final step = _steps[_currentStepIndex];
+    final activity = step.activity;
+    final currentExercise = step.exercise;
     final isDuration =
         activity.durationSeconds != null && activity.durationSeconds! > 0;
-
-    final currentExercise = widget.allExercises.firstWhere(
-      (e) => e.id == activity.exerciseId,
-      orElse: () => ExerciseModel(
-        id: '?',
-        name: 'Loading...',
-        bodyPart: '',
-        difficulty: '',
-        instructions: [],
-        imageUrl: '',
-        equipment: '',
-      ),
-    );
 
     return WillPopScope(
       onWillPop: _onWillPop,
@@ -574,7 +676,7 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: LinearProgressIndicator(
-                  value: (_currentExerciseIndex + 1) / totalSteps,
+                  value: (_currentStepIndex + 1) / totalSteps,
                   backgroundColor: Colors.grey[200],
                   valueColor: const AlwaysStoppedAnimation<Color>(
                     Color(0xFFFF6B6B),
@@ -592,8 +694,8 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
                 itemCount: totalSteps,
                 itemBuilder: (context, index) {
                   // Re-fetch correct data for the index (though we mainly use state)
-                  // We use _currentExerciseIndex state for logic, this builder is just for slide transition
-                  if (index != _currentExerciseIndex) {
+                  // We use _currentStepIndex state for logic, this builder is just for slide transition
+                  if (index != _currentStepIndex) {
                     return const SizedBox.shrink();
                   }
 
@@ -603,7 +705,7 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
                       children: [
                         // 3D Model Viewer Placeholder
                         Container(
-                          height: 250,
+                          height: 180,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -621,7 +723,7 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(24),
                                 child: ModelViewer(
-                                  src: _getGlbPathForExercise(
+                                  src: getGlbPathForExercise(
                                     currentExercise.name,
                                   ),
                                   alt: currentExercise.name,
@@ -684,89 +786,30 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
-                                Text(
-                                  currentExercise.name,
-                                  style: const TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 8),
-
-                                // INSTRUCTIONS UI
-                                if (currentExercise.instructions.isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      top: 8.0,
-                                      bottom: 16.0,
-                                    ),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[100],
-                                        borderRadius: BorderRadius.circular(16),
-                                        border: Border.all(
-                                          color: Colors.grey[300]!,
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        currentExercise.name,
+                                        style: const TextStyle(
+                                          fontSize: 28,
+                                          fontWeight: FontWeight.bold,
                                         ),
-                                      ),
-                                      child: ListView.builder(
-                                        shrinkWrap: true,
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        padding: const EdgeInsets.all(12),
-                                        itemCount:
-                                            currentExercise.instructions.length,
-                                        itemBuilder: (context, idx) {
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                              bottom: 8.0,
-                                            ),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Container(
-                                                  margin: const EdgeInsets.only(
-                                                    top: 2,
-                                                    right: 10,
-                                                  ),
-                                                  padding: const EdgeInsets.all(
-                                                    6,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: const Color(
-                                                      0xFFFF6B6B,
-                                                    ).withOpacity(0.1),
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: Text(
-                                                    "${idx + 1}",
-                                                    style: const TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Color(0xFFFF6B6B),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Text(
-                                                    currentExercise
-                                                        .instructions[idx],
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                      color: Colors.black87,
-                                                      height: 1.4,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
+                                        textAlign: TextAlign.center,
                                       ),
                                     ),
-                                  ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.help_outline,
+                                        color: Color(0xFFFF6B6B),
+                                      ),
+                                      onPressed: () =>
+                                          _showHelpSheet(currentExercise),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
 
                                 if (activity.notes != null)
                                   Container(
@@ -837,8 +880,12 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
                                     ),
                                   ),
                                 ] else ...[
-                                  // Sets List
+                                  // Simplified Reps display
                                   Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 24,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(24),
@@ -846,99 +893,30 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
                                         color: Colors.grey[200]!,
                                       ),
                                     ),
-                                    padding: const EdgeInsets.all(8),
                                     child: Column(
-                                      children: List.generate(
-                                        _completedSets.length,
-                                        (i) {
-                                          return InkWell(
-                                            onTap: () {
-                                              final isCurrentlyChecked =
-                                                  _completedSets[i];
-                                              setState(() {
-                                                _completedSets[i] =
-                                                    !isCurrentlyChecked;
-                                              });
-
-                                              // If we just checked it (and it's not the last set), trigger a set rest
-                                              if (!isCurrentlyChecked &&
-                                                  i <
-                                                      _completedSets.length -
-                                                          1) {
-                                                _showRestOverlay(
-                                                  isBetweenSets: true,
-                                                );
-                                              }
-                                            },
-                                            borderRadius: BorderRadius.circular(
-                                              16,
-                                            ),
-                                            child: Container(
-                                              padding: const EdgeInsets.all(16),
-                                              margin: const EdgeInsets.only(
-                                                bottom: 4,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: _completedSets[i]
-                                                    ? const Color(0xFFE8F5E9)
-                                                    : Colors.transparent,
-                                                borderRadius:
-                                                    BorderRadius.circular(16),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    "Set ${i + 1}",
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: _completedSets[i]
-                                                          ? Colors.green[800]
-                                                          : Colors.grey[800],
-                                                    ),
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        _getSetProgressText(
-                                                          i,
-                                                          activity.reps ?? 12,
-                                                        ),
-                                                        style: TextStyle(
-                                                          color:
-                                                              _completedSets[i]
-                                                              ? Colors
-                                                                    .green[700]
-                                                              : Colors
-                                                                    .grey[600],
-                                                          fontWeight:
-                                                              _completedSets[i]
-                                                              ? FontWeight.bold
-                                                              : FontWeight
-                                                                    .normal,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(width: 12),
-                                                      Icon(
-                                                        _completedSets[i]
-                                                            ? Icons.check_circle
-                                                            : Icons
-                                                                  .circle_outlined,
-                                                        color: _completedSets[i]
-                                                            ? Colors.green
-                                                            : Colors.grey[300],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "Set ${step.setIndex + 1} of ${step.totalSets}",
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          _getSetProgressText(
+                                            activity.reps ?? 12,
+                                          ),
+                                          style: const TextStyle(
+                                            fontSize: 48,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF212121),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -989,8 +967,8 @@ class _ActiveWorkoutSessionState extends ConsumerState<ActiveWorkoutSession> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        _currentExerciseIndex < totalSteps - 1
-                            ? "Next Exercise"
+                        _currentStepIndex < totalSteps - 1
+                            ? "Complete Set"
                             : "Finish Workout",
                         style: const TextStyle(
                           fontSize: 18,

@@ -8,6 +8,32 @@ import '../pages/active_workout_overview.dart';
 import '../../domain/custom_workout.dart';
 import '../../data/custom_workout_repository.dart';
 import '../../../authentication/data/user_repository.dart';
+import 'package:model_viewer_plus/model_viewer_plus.dart';
+import '../../utils/exercise_model_utils.dart';
+
+class _Badge extends StatelessWidget {
+  final String text;
+  final Color color;
+  const _Badge({required this.text, required this.color});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+}
 
 class WorkoutCrafterView extends ConsumerStatefulWidget {
   const WorkoutCrafterView({super.key});
@@ -219,13 +245,7 @@ class _WorkoutCrafterViewState extends ConsumerState<WorkoutCrafterView> {
     final isSelected = _selectedExercises.contains(ex);
     return GestureDetector(
       onTap: () {
-        setState(() {
-          if (isSelected) {
-            _selectedExercises.remove(ex);
-          } else {
-            _selectedExercises.add(ex);
-          }
-        });
+        _showExercisePreview(context, ex);
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
@@ -302,6 +322,136 @@ class _WorkoutCrafterViewState extends ConsumerState<WorkoutCrafterView> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showExercisePreview(BuildContext context, ExerciseModel ex) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.75,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Drag handle
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 12, bottom: 16),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+
+              // 3D Model Viewer
+              Container(
+                height: 250,
+                width: double.infinity,
+                color: Colors.grey[50],
+                child: ModelViewer(
+                  src: getGlbPathForExercise(ex.name),
+                  alt: ex.name,
+                  autoPlay: true,
+                  autoRotate: true,
+                  cameraControls: true,
+                  disableZoom: true,
+                  backgroundColor: Colors.transparent,
+                ),
+              ),
+
+              // Exercise Details
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        ex.name,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          _Badge(text: ex.bodyPart, color: Colors.blue),
+                          const SizedBox(width: 8),
+                          _Badge(text: ex.difficulty, color: Colors.orange),
+                          const SizedBox(width: 8),
+                          _Badge(text: ex.equipment, color: Colors.purple),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      const Text(
+                        "Instructions",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      if (ex.instructions.isEmpty)
+                        const Text(
+                          "No instructions available.",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ...ex.instructions.asMap().entries.map((entry) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  color: const Color(
+                                    0xFFFF6B6B,
+                                  ).withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "${entry.key + 1}",
+                                    style: const TextStyle(
+                                      color: Color(0xFFFF6B6B),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  entry.value,
+                                  style: const TextStyle(height: 1.4),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
