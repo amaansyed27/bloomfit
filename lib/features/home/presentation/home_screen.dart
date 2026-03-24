@@ -105,7 +105,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void _showWebCompanionDialog() {
     final TextEditingController codeController = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (context) {
@@ -114,7 +114,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text("Enter the 4-digit pairing code from mocap-web running on your laptop."),
+              const Text(
+                "Enter the 4-digit pairing code from mocap-web running on your laptop.",
+              ),
               const SizedBox(height: 16),
               TextField(
                 controller: codeController,
@@ -122,7 +124,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 maxLength: 4,
                 decoration: InputDecoration(
                   labelText: "Pairing Code",
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ],
@@ -137,7 +141,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 final code = codeController.text.trim();
                 if (code.length == 4) {
                   // Set connected session provider
-                  ref.read(webCompanionSessionProvider.notifier).setSession(code);
+                  ref
+                      .read(webCompanionSessionProvider.notifier)
+                      .setSession(code);
                   if (context.mounted) {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -195,81 +201,87 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
 
           // Floating HUD (Top)
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 16, // Dynamic top padding
-            left: 20,
-            right: 20,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.95),
-                borderRadius: BorderRadius.circular(30),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFE0F7FA),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.person,
-                          color: Color(0xFF00ACC1),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            displayName,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
+          if (_currentIndex != 2) // Hide on Profile Tab
+            Positioned(
+              top:
+                  MediaQuery.of(context).padding.top +
+                  16, // Dynamic top padding
+              left: 20,
+              right: 20,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.95),
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFE0F7FA),
+                            shape: BoxShape.circle,
                           ),
-                          Text(
-                            "Level $level",
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 12,
-                            ),
+                          child: const Icon(
+                            Icons.person,
+                            color: Color(0xFF00ACC1),
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      _HeaderPill(
-                        icon: Icons.local_fire_department,
-                        text: "$streak",
-                        color: const Color(0xFFFF6B6B),
-                      ),
-                      const SizedBox(width: 8),
-                      _HeaderPill(
-                        icon: Icons.bolt,
-                        text: "$xp",
-                        color: const Color(0xFFFFD93D),
-                      ),
-                    ],
-                  ),
-                ],
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              displayName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Text(
+                              "Level $level",
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        _HeaderPill(
+                          icon: Icons.local_fire_department,
+                          text: "$streak",
+                          color: const Color(0xFFFF6B6B),
+                        ),
+                        const SizedBox(width: 8),
+                        _HeaderPill(
+                          icon: Icons.bolt,
+                          text: "$xp",
+                          color: const Color(0xFFFFD93D),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
         ],
       ),
       bottomNavigationBar: NavigationBar(
@@ -381,7 +393,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildProfileView(String name, int level, int streak, int xp) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(24.0, 100.0, 24.0, 24.0),
+        padding: const EdgeInsets.fromLTRB(24.0, 48.0, 24.0, 24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -407,18 +419,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               color: Colors.orange,
             ),
             const SizedBox(height: 16),
-            ref.watch(todayStepsProvider).when(
+            ref
+                .watch(todayStepsProvider)
+                .when(
                   data: (steps) => _ProfileStatCard(
                     icon: Icons.directions_walk,
                     label: "Today's Steps",
                     value: "$steps",
                     color: Colors.green,
                   ),
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                   error: (_, __) => const SizedBox.shrink(),
                 ),
             const SizedBox(height: 16),
-            ref.watch(todayCaloriesProvider).when(
+            ref
+                .watch(todayCaloriesProvider)
+                .when(
                   data: (cals) => _ProfileStatCard(
                     icon: Icons.monitor_heart,
                     label: "Active Calories",
@@ -453,15 +470,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               onPressed: () {
                 final code = ref.read(webCompanionSessionProvider);
                 if (code != null) {
-                  final exercise = ExerciseModel(id: "squat_001", name: "Squat (Demo Mode)", bodyPart: "Legs", difficulty: "Easy", instructions: [], imageUrl: "", equipment: "");
-                  final activity = WorkoutActivity(exerciseId: "squat_001", sets: 1, reps: 5, notes: "Demo");
-                  
-                  ref.read(webCompanionServiceProvider).updateLiveSession(
-                    code,
-                    activity,
-                    exercise
+                  final exercise = ExerciseModel(
+                    id: "squat_001",
+                    name: "Squat (Demo Mode)",
+                    bodyPart: "Legs",
+                    difficulty: "Easy",
+                    instructions: [],
+                    imageUrl: "",
+                    equipment: "",
                   );
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Triggered Squat Demo on Web!")));
+                  final activity = WorkoutActivity(
+                    exerciseId: "squat_001",
+                    sets: 1,
+                    reps: 5,
+                    notes: "Demo",
+                  );
+
+                  ref
+                      .read(webCompanionServiceProvider)
+                      .updateLiveSession(code, activity, exercise);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Triggered Squat Demo on Web!"),
+                    ),
+                  );
 
                   Navigator.push(
                     context,
@@ -475,7 +507,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   );
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Connect to Web Companion first!")));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Connect to Web Companion first!"),
+                    ),
+                  );
                 }
               },
               icon: const Icon(Icons.play_circle_filled),
