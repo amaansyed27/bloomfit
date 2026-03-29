@@ -24,7 +24,7 @@ By moving the entire motion capture and form-correction engine to the user's loc
 ## 2. Current MVP Status
 
 As of its initial release for the university EPICS presentation, BloomFit is a fully functional **Minimum Viable Product (MVP)**. It successfully proves the core concepts:
-*   **The AI Engine Works**: Gemini 1.5 Flash successfully generates dynamic, personalized workout journeys and adapts them based on user feedback (e.g., skipping exercises due to injury).
+*   **The AI Engine Works**: Gemini 3 Flash successfully generates dynamic, personalized workout journeys and adapts them based on user feedback (e.g., skipping exercises due to injury).
 *   **The Mocap Bridge Works**: The real-time synchronization between the Flutter mobile app and the React Web Companion operates with near-zero latency via Firestore.
 *   **The Biomechanics Engine Works**: Google MediaPipe successfully tracks 3D skeletal joints in the browser, accurately counting reps and correcting form for core exercises (like Squats).
 *   **The UI/UX is Polished**: The mobile app features a premium, clutter-free Circuit Flow engine, embedded 3D coaching models (Mixamo), and a gamified progression system (XP, streaks, Health Connect integration).

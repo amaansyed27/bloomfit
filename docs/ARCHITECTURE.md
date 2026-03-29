@@ -3,7 +3,7 @@
 ## 1. System Overview
 BloomFit is a next-generation fitness tracking ecosystem comprised of a **Flutter mobile application** (the core hub) and a **React-based Web Companion** (for real-time motion capture). Both platforms communicate synchronously through a centralized **Firebase/Firestore backend**.
 
-The system is built on modern, scalable architectural principles using **Riverpod** for state management, **Gemini 1.5 Flash** for dynamic AI plan generation, and **MediaPipe** for localized, privacy-first skeletal tracking.
+The system is built on modern, scalable architectural principles using **Riverpod** for state management, **Gemini 3 Flash** for dynamic AI plan generation, and **MediaPipe** for localized, privacy-first skeletal tracking.
 
 ---
 
@@ -66,7 +66,7 @@ graph TD
 *   **State Management:** `flutter_riverpod` - Ensures highly decoupled business logic and reactive UI updates.
 *   **Local 3D Rendering:** `model_viewer_plus` - Renders complex `.glb` character animations natively without network latency.
 *   **Health Integration:** `health` package - securely syncs with Android Health Connect to read daily steps and active calories.
-*   **AI Integration:** `google_generative_ai` - Connects to Gemini 1.5 Flash to generate personalized, non-linear "Workout Journeys" based on user goals, experience, and past performance.
+*   **AI Integration:** `google_generative_ai` - Connects to Gemini 3 Flash to generate personalized, non-linear "Workout Journeys" based on user goals, experience, and past performance.
 
 ### 3.2. The React Web Companion (mocap-web)
 *   **Framework:** React (TypeScript), Vite.

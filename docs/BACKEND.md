@@ -31,7 +31,7 @@ The most complex integration is the **Synchronous Bridge** between the Flutter m
 ### The Feedback Loop
 While the user exercises, the Web Companion continuously calculates their joint angles. When a rep is completed, or a form correction is needed, it updates the `currentReps` and `formFeedback` fields in the `live_sessions/8492` document. The Flutter app's `ActiveWorkoutSession` screen listens to this exact document using a `StreamSubscription`. Any change instantly triggers a `setState` on the phone, updating the giant rep counter and feedback text in under 100 milliseconds.
 
-## 4. Generative AI (Gemini 1.5 Flash)
+## 4. Generative AI (Gemini 3 Flash)
 
 BloomFit does not use hardcoded workout templates. It uses a **PathGenerationService** connected to Google's `gemini-1.5-flash` model.
 

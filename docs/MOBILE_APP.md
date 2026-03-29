@@ -15,7 +15,7 @@ BloomFit's design language revolves around **"Decluttered Focus."** Working out 
 
 ### A. The AI Journey
 The primary tab of the app is a vertical, scrollable node map (similar to Duolingo or Candy Crush).
-*   Powered by Google's **Gemini 1.5 Flash**, the app dynamically generates a multi-day workout path based on the user's explicit goals and experience level.
+*   Powered by Google's **Gemini 3 Flash**, the app dynamically generates a multi-day workout path based on the user's explicit goals and experience level.
 *   **Dynamic Rerouting:** If a user skips a "Heavy Squat" exercise and selects "Pain or Injury" as the reason, the AI will restructure the future nodes to avoid heavy leg workouts and focus on recovery or upper body.
 
 ### B. The Workout Hub (Custom Crafter)

@@ -12,7 +12,7 @@ BloomFit is an intelligent, adaptive fitness platform designed to replace generi
 
 ## 🌟 Core Features
 
-*   **🧠 Gemini AI Workout Journeys**: Powered by Google's Gemini 1.5 Flash, the app generates multi-day, progressive workout paths tailored entirely to your goals, experience level, and past performance. If you struggle with an exercise or skip it due to injury, the AI dynamically reroutes your future path.
+*   **🧠 Gemini AI Workout Journeys**: Powered by Google's Gemini 3 Flash, the app generates multi-day, progressive workout paths tailored entirely to your goals, experience level, and past performance. If you struggle with an exercise or skip it due to injury, the AI dynamically reroutes your future path.
 *   **💻 Real-Time Web Companion (Mocap)**: Connect your phone to your laptop browser via a secure 4-digit code. Using Google MediaPipe, the web app analyzes your webcam feed, tracks your skeletal joints in 3D, counts your reps, and provides live form feedback directly to your phone.
 *   **🧍‍♂️ 3D Animated Coaching**: View ultra-smooth, 3D character animations (Mixamo `.glb` models) natively inside the app before and during your workout to ensure you know exactly how to perform the movement.
 *   **⚡ Circuit-Style Workout Engine**: A deeply optimized UI that prevents clutter by guiding you through your workout one single set at a time, enforcing proper 30-second rest intervals between exercises.
@@ -42,7 +42,7 @@ We have extensively documented the architecture, APIs, and future scope of the B
 *   **Framework**: Flutter & Dart
 *   **State Management**: Riverpod (`flutter_riverpod`)
 *   **3D Rendering**: `model_viewer_plus`
-*   **AI Engine**: `google_generative_ai` (Gemini 1.5 Flash)
+*   **AI Engine**: `google_generative_ai` (Gemini 3 Flash)
 *   **Health Data**: `health` package (Android Health Connect)
 
 ### Web Companion (Motion Capture)

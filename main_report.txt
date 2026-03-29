@@ -1,0 +1,500 @@
+Bloomfit - AI-Powered Fitness Companion
+An Engineering Project in Community Service
+Phase – II Report
+Submitted by
+Sl. No.       Register Number              Name 
+		1	            23BCE10217         Arya Mitesh Jain
+		2		   23BCE10234	        Kajal Mehta
+		3		   23BCE10345	       Varda Joshi
+		4		   23BCE11160	       Anushree Chatterjee
+		5		   23MIP10110	       Rajveer Baweja
+		6		   23MIP10116	       Amaan Syed
+in partial fulfillment of the requirements for the degree of
+Bachelor of Technology
+VIT Bhopal University
+Bhopal
+Madhya Pradhesh
+   November, 2025
+Bonafide Certificate
+Certified that this project report titled “Bloomfit- AI powered fitness companion” is the bonafide work of “23BCE10217 Arya Mitesh Jain, 23BCE10234 Kajal Mehta, 23BCE10345 Varda Joshi, 23BCE11160 Anushree Chatterjee, 23MIP10110 Rajweer Baweja, 23MIP10116 Amaan Syed” who carried out the project work under my supervision.                 		 
+This project report (Phase II) is submitted for the Project Viva-Voce examination held on 25th March, 2026.
+								          Dr. Vijay Kumar Trivedi
+Supervisor
+Dr. Sheerin Kayenat
+Comments & Signature  ( Reviewer 1)
+Dr. Rizwan Ur Rahman
+Comments & Signature  ( Reviewer 2)
+Declaration of Originality
+We, hereby declare that this report entitled “Bloomfit- AI powered fitness companion'' represents our original work carried out for the EPICS project as a student of VIT Bhopal University and, to the best of our knowledge, it contains no material previously published or written by another person, nor any material presented for the award of any other degree or diploma of VIT Bhopal University or any other institution. Works of other authors cited in this report have been duly acknowledged under the section ''References''. 
+Acknowledgement
+This work, culminating in the successful completion of Phase 1 of the Bloomfit project, has benefited in various ways from several people and organizations. Whilst it would be simple to name them all, it would not be easy to thank them enough.
+We extend our sincerest gratitude to our Faculty Project Supervisor, Dr. Vijay Kumar Trivedi, for their invaluable guidance, intellectual mentorship, and constant encouragement throughout this phase. Their insights were instrumental in shaping the technical direction and architectural choices of the application.
+We also wish to acknowledge the foundational technological partners and inspirations that made the development of the Minimum Viable Product (MVP) possible:
+Google Gemini for providing the cutting-edge large language model capabilities that power the Bloom AI Assistant, ensuring truly adaptive and conversational personalized fitness advice.
+Google Firebase for offering the scalable, reliable backend infrastructure, including Authentication and Cloud Firestore, which were critical for rapid Phase 1 development and data management.
+The Flutter and Dart community for the robust cross-platform development environment that allowed us to efficiently build a high-quality mobile application.
+Duolingo, whose innovative and highly engaging user experience served as the primary inspiration for Bloomfit's gamified pathway design, guiding our efforts to maximize user adherence.
+Finally, we thank our colleagues and friends for their constructive feedback and support, which provided a necessary perspective during the demanding development process. The success of this phase is a testament to the collaborative effort of everyone involved.
+Abstract
+In the present work, we have designed and developed BloomFit, a modern, cross-platform fitness application tailored to help users effectively track their workouts, discover new exercises, and seamlessly manage their overall fitness journey. Built utilizing the Flutter framework for a highly responsive user interface and Firebase as a robust Backend-as-a-Service, the application ensures secure user authentication (via Google Sign-In) and reliable data storage using Cloud Firestore.
+To maintain a scalable and maintainable codebase, the system architecture adheres strictly to Feature-based Domain Driven Design (DDD) principles. It integrates Riverpod for robust state management and GoRouter for clean navigation routing. Furthermore, the application strongly prioritizes user experience by featuring personalized onboarding flows, a comprehensive exercise library with seeding capabilities, and dynamic UI theming enhanced by smooth animations. Ultimately, BloomFit provides a comprehensive, secure, and highly engaging digital solution for modern personal fitness management.
+Index
+Sl. No. 		Topic							Page No.
+                     Introduction                                                         1
+1.1                Motivation                                                             1
+1.2                Objective                                                               2
+                     Existing Work                                                      4     
+2.1 		Review of existing fitness application		       4	       
+		and market gaps
+2.1.1		Streaming and template-based services	       4
+2.1.2		Passive Tracking and Logging 			       4
+		Applications
+2.2		Gamification and behavioural science 		       4
+in Habit Formation
+	2.2.1		The Duolingo Model of Progression		       4
+	2.3		Adaptive Programming through LLM		       5
+2.3.1		Contextual and Generative Capabilities	       5
+2.3.2		The Adaptive Feedback Loop(RPE)	                 5
+3.			Topic of the Work (Proposed System)               7		
+3.1 		Core Concept: Duolingo-Inspired UX                  7
+3.2 		Key Features and Scope 				      
+(Phase 1 Accomplishments)                                  7
+3.2.1 		Authentication and Comprehensive 
+Onboarding                                                            7
+3.2.2 		Personalized Workout Pathway System                8
+3.2.3 		Bloom AI Assistant (Gemini Integration)             8
+3.2.4 		Gamification System (XP and Streaks)                 9
+4.			System Design and Architecture                        10
+4.1 		Overall System Architecture                                 10
+4.2 		Frontend Architecture (Flutter, Dart, Riverpod)   11
+4.3 		Backend Architecture (Firebase, 
+Firestore, Gemini)                                                 13
+    5. 			Working Principle				       15
+	5.1		User Onboarding and Data Capture		       15
+	5.1.1		Data Points Collected				       15
+	5.1.2		Data Storage					       16
+	5.1.3		Output of Onboarding				       16
+	5.2		Dynamic Pathway Generation Algorithm	       16
+	5.2.1		Algorithm flow					       16
+	5.2.2		Output						       17
+	5.3		AI Feedback Loop Mechanism			       18
+	5.3.1		Data collected post workout			       18
+5.3.2		AI interpretation logic			                 18
+5.3.3		Adaptation output					       18
+6.			Results and Discussion				       20
+	6.1		Phase 1 deliverables verifications		       20
+	6.2		Discussions of key metrics			       22
+	6.3		Challenges encountered and mitigations	       22
+7.			Phase 2 and future scope			       24
+	7.1		Plan for phase 2       				       24
+	7.2		Implementation					       24
+8.			Individual Contributions			       25
+8.1		Amaan Syed						       25
+8.2		Rajweer Baweja					       25
+8.3		Anushree Chatterjee				       26
+8.4		Varda Joshi						       26
+8.5		Arya Mitesh Jain					       27
+8.6		Kajal Mehta						       27
+9.			Conclusion						       29
+10.			References						       30
+11. 			Biodata						       31
+1. INTRODUCTION
+Access to quality fitness guidance remains a significant challenge in many communities due to financial constraints, privacy concerns, and social barriers. A large population is unable to afford personal trainers or feels uncomfortable exercising in public gym environments, leading them to rely on unguided home workouts that often result in inconsistency and incorrect exercise form.
+Existing digital fitness applications attempt to address this issue but fall short in critical areas. Most platforms provide static workout plans or basic tracking features without real-time feedback or true personalization, while also neglecting user privacy concerns.
+BloomFit is an AI-powered, privacy-first fitness ecosystem designed to democratize access to intelligent workout guidance. It combines a Flutter-based mobile application with a React-based Web Companion to deliver real-time feedback, dynamic workout generation, and personalized fitness experiences without requiring physical trainers or gym access.
+The system uses Google Gemini 3 Flash to generate adaptive workout pathways based on user goals, experience level, equipment availability, and historical performance. To ensure correct exercise execution, BloomFit integrates a real-time biomechanical analysis system using MediaPipe, which tracks 3D skeletal landmarks to perform rep counting, posture correction, and accuracy evaluation.
+A key feature of BloomFit is its privacy-first design. All motion capture and video processing are performed locally on the user’s device, with only minimal data such as repetition counts and feedback signals transmitted through Firebase.
+Additionally, the system incorporates a continuous feedback loop where user inputs and performance metrics are analyzed to refine future workouts, enabling the platform to function as an adaptive digital trainer that evolves with the user.
+This project aims to provide an accessible, intelligent, and private fitness solution that empowers individuals to maintain consistent and safe workout routines from their homes.
+1.1 MOTIVATION (PROBLEM STATEMENT)
+Access to effective fitness guidance remains a significant challenge due to multiple real-world barriers, particularly in regions where affordability, privacy, and accessibility are major concerns. While digital fitness applications have grown rapidly, they fail to address several fundamental issues that impact user consistency, safety, and long-term adherence.
+The key challenges motivating this project are as follows:
+● Financial and Accessibility Barriers: Professional fitness guidance through personal trainers or gym memberships is often expensive and inaccessible to a large population. As a result, many individuals rely on unguided home workouts, which lack structured supervision and reduce effectiveness.
+● Privacy and Social Discomfort: A considerable number of users avoid gym environments due to social anxiety, fear of judgment, or cultural constraints. This creates a strong preference for home-based workouts, where users feel more comfortable but lack proper guidance and feedback.
+● Lack of Personalization and Adaptivity: Existing fitness applications primarily rely on static or template-based workout programs. These systems fail to adapt to individual user needs, physical conditions, injuries, or performance variations, leading to ineffective and monotonous workout experiences.
+● Absence of Real-Time Feedback and Accuracy Measurement: Users performing exercises at home have no reliable mechanism to verify whether their posture and movements are correct. The lack of real-time feedback leads to incorrect form, reduced workout efficiency, and increased risk of injury.
+● Low Engagement and Consistency: Fitness requires long-term commitment, but many applications fail to maintain user motivation. The absence of adaptive feedback loops, meaningful progress tracking, and intelligent recommendations results in poor adherence and high dropout rates.
+BloomFit is motivated by the need to address these interconnected challenges through a unified and intelligent system. By integrating AI-driven dynamic workout generation, real-time biomechanical analysis, and a privacy-first architecture, the platform aims to provide accessible, personalized, and safe fitness guidance.
+This project aligns with the EPICS philosophy by focusing on solving a community-relevant problem and delivering a scalable solution that improves health accessibility, promotes consistency, and reduces barriers to fitness for a wider population.
+1.2 OBJECTIVES AND GOALS
+The primary objective of the BloomFit project is to design and develop an intelligent, accessible, and privacy-focused fitness system that enables users to perform effective workouts without the need for physical trainers or gym environments.
+The specific objectives of the project are as follows:
+● Develop a Dynamic Workout Generation Engine:
+To implement an AI-driven system using Google Gemini that generates personalized workout pathways based on user goals, experience level, available equipment, and historical performance.
+● Enable Real-Time Biomechanical Analysis:
+To integrate computer vision techniques using MediaPipe for detecting body posture through skeletal landmarks and performing joint-angle calculations for accurate exercise evaluation.
+● Implement Automatic Rep Counting and Accuracy Measurement:
+To design a system that tracks repetitions and evaluates exercise correctness using threshold-based movement analysis, generating accuracy scores for each workout session.
+● Ensure Privacy-First System Design:
+To develop a solution where all motion capture and video processing occur locally on the user’s device, ensuring that no visual data is stored or transmitted, and only minimal metadata is shared securely.
+● Create a Continuous Feedback and Adaptation Loop:
+To incorporate user feedback such as perceived exertion, skipped exercises, and performance data to dynamically adjust future workout plans.
+● Provide a Scalable and Real-Time System Architecture:
+To utilize Firebase services for authentication, real-time synchronization, and data storage, enabling seamless communication between the mobile application and the web companion.
+● Enhance Accessibility and User Consistency:
+To deliver a system that promotes regular fitness habits by providing structured guidance, real-time feedback, and adaptive recommendations in a home-based environment.
+The overall goal of this project is to build a system that not only improves fitness accessibility but also ensures safety, personalization, and long-term user adherence through intelligent automation and real-time feedback.
+2. EXISTING WORK / LITERATURE REVIEW
+The development of Bloomfit is grounded in an extensive analysis of the current digital health ecosystem, which intersects exercise science, human-computer interaction (HCI), and advancements in artificial intelligence and computer vision. With the rapid growth of mobile fitness applications, there has been a significant shift toward digital solutions for health and wellness. However, despite this growth, existing systems continue to exhibit critical limitations in terms of personalization, real-time feedback, user engagement, and privacy. This literature review explores these limitations in detail and identifies the research gaps that motivate the proposed system.
+2.1 REVIEW OF EXISTING FITNESS APPLICATIONS AND MARKET GAPS
+The digital fitness landscape is broadly categorized into multiple types of applications, each addressing specific aspects of fitness but failing to provide a comprehensive solution. These categories include streaming-based platforms, template-driven workout planners, and passive tracking applications. While these systems have contributed to making fitness more accessible, they suffer from inherent limitations that lead to high user churn rates and low long-term adherence.
+Research in mobile health systems highlights that lack of personalization and adaptability is one of the primary reasons for user disengagement. Studies indicate that users are more likely to abandon fitness applications when the content does not evolve based on their performance or changing physical conditions (Zhou et al., 2018; Monteiro-Guerra et al., 2019). This highlights the need for systems that can dynamically adapt to individual users rather than relying on static models.
+2.1.1 STREAMING AND TEMPLATE-BASED SERVICES
+Streaming-based fitness platforms and template-driven workout applications are among the most widely used solutions in the digital fitness domain. These platforms provide structured workout routines, often designed by professional trainers, and deliver them through video-based or pre-defined formats.
+While these systems offer convenience and accessibility, they fundamentally lack personalization. Workouts are designed for a general audience and do not account for individual differences such as fitness level, injury history, or real-time performance. As a result, users often experience either undertraining or overtraining, both of which negatively impact fitness outcomes.
+Furthermore, these systems operate on static programming models, where the workout plan remains fixed regardless of user feedback. Research in adaptive systems suggests that such static approaches are unable to respond effectively to dynamic human conditions, such as fatigue accumulation or unexpected physical discomfort (Zhou et al., 2018). This rigidity limits the system’s ability to provide safe and effective training over time.
+Another major limitation is the absence of feedback mechanisms. Users are expected to follow along with video instructions without any form of validation or correction. This creates a disconnect between instruction and execution, increasing the likelihood of incorrect form and potential injury.
+2.1.2 PASSIVE TRACKING AND LOGGING APPLICATIONS
+Another major category of fitness applications includes passive tracking systems that focus on recording workout-related data such as sets, repetitions, duration, and calories burned. These applications are widely used by experienced users who already possess knowledge of structured training programs.
+While these tools are effective for data aggregation and performance tracking, they lack proactive intelligence and guidance. The responsibility of designing workouts, adjusting intensity, and ensuring progression lies entirely with the user. For beginners or individuals without formal training knowledge, this can be a significant barrier.
+Research indicates that passive systems are insufficient for promoting long-term engagement, as users require guidance, feedback, and motivation to maintain consistency (Monteiro-Guerra et al., 2019). Additionally, these systems do not incorporate contextual information such as user fatigue, injury, or recovery status, which are essential for effective training.
+The primary gap across both categories is the absence of a system that combines structured engagement with intelligent, context-aware adaptability.
+2.2 GAMIFICATION AND BEHAVIORAL SCIENCE IN HABIT FORMATION
+In addition to technical limitations, user engagement plays a critical role in the success of fitness applications. The effectiveness of a fitness system is not solely determined by the quality of workouts but also by the user’s ability to adhere to the program over time.
+Research in behavioral science and HCI emphasizes the importance of motivation, reinforcement, and habit formation in sustaining long-term engagement. Gamification has emerged as a popular strategy to address these challenges by incorporating game-like elements such as rewards, streaks, levels, and progress tracking.
+Gamified systems provide immediate psychological rewards, which help bridge the gap between effort and outcome. This is particularly important in fitness, where physical results are often delayed. By providing instant feedback and visible progress, gamification enhances user motivation and encourages consistent participation.
+2.2.1 THE DUOLINGO MODEL OF PROGRESSION
+One of the most successful implementations of gamification is the pathway-based progression model popularized by learning platforms. In this model, user activities are structured into sequential units and lessons, creating a clear and visually engaging roadmap.
+Key elements of this approach include:
+Visual progression pathways that reduce cognitive load and provide clear goals
+Streak systems that leverage behavioral principles such as loss aversion
+Experience points (XP) and leveling systems that provide immediate feedback
+These mechanisms have been shown to significantly improve user retention and consistency. However, research also indicates that while gamification enhances engagement, it does not address deeper issues such as personalization, adaptability, and exercise accuracy (Monteiro-Guerra et al., 2019). Without intelligent feedback and dynamic adjustments, gamification alone is insufficient to ensure effective training outcomes.
+2.3 ADAPTIVE PROGRAMMING THROUGH LARGE LANGUAGE MODELS (LLMS)
+Recent advancements in artificial intelligence have introduced new possibilities for adaptive fitness systems. Machine learning and AI-driven approaches enable the development of systems that can analyze user data and generate personalized recommendations in real time.
+Large Language Models (LLMs) represent a significant advancement in this domain. These models are capable of understanding complex user inputs and generating context-aware responses. In the context of fitness applications, LLMs can be used to generate dynamic workout plans, modify exercises based on user feedback, and provide personalized coaching.
+Research demonstrates that AI-based personalization significantly improves user engagement and reduces dropout rates by tailoring content to individual preferences and performance (Li, 2024). Unlike traditional rule-based systems, AI-driven systems can adapt non-linearly, allowing for continuous improvement and refinement of workout plans.
+2.3.1 CONTEXTUAL AND GENERATIVE CAPABILITIES
+One of the key advantages of AI systems is their ability to generate content dynamically based on context. These systems can incorporate multiple variables such as user goals, experience level, available equipment, and historical performance to create customized workout plans.
+Additionally, AI systems can process natural language inputs, allowing users to request modifications in real time. For example, users can adjust workout intensity, duration, or exercise selection based on their current condition. This level of flexibility is not possible in traditional systems.
+2.3.2 THE ADAPTIVE FEEDBACK LOOP (RPE)
+A critical component of adaptive systems is the integration of feedback mechanisms. The Rate of Perceived Exertion (RPE) is widely used in exercise science as a subjective measure of workout intensity. Research indicates that RPE is a reliable indicator for adjusting training load and preventing overtraining.
+By incorporating RPE and pain feedback into the system, AI models can dynamically adjust workout intensity and structure. For instance, high RPE values may trigger a reduction in volume or intensity, while low RPE values may lead to progressive overload. This creates a continuous feedback loop that enhances both safety and effectiveness (Monteiro-Guerra et al., 2019).
+2.4 COMPUTER VISION IN FITNESS APPLICATIONS
+Computer vision technologies have played a crucial role in enabling real-time analysis of human movement. Pose estimation techniques allow systems to detect skeletal landmarks and track body movements with high precision.
+Frameworks such as MediaPipe provide real-time detection of three-dimensional landmarks, enabling biomechanical analysis through joint-angle calculations. These systems form the foundation for applications that require motion tracking, posture correction, and activity recognition.
+Recent studies demonstrate that pose estimation frameworks can be effectively used for exercise posture recognition and repetition counting (Supanich et al., 2023; Ram et al., 2024). These systems provide immediate feedback, allowing users to correct their form during workouts.
+Further research highlights that MediaPipe-based pose estimation achieves reliable accuracy in physiotherapy and rehabilitation settings, making it suitable for real-world fitness applications (Simoes et al., 2024). This is particularly important for home-based workouts, where users do not have access to professional supervision.
+In addition, several systems have been developed for posture correction using deep learning and skeletal tracking techniques. These systems analyze joint angles and movement patterns to identify incorrect posture and provide corrective feedback (Agarwal et al., 2021; Raza et al., 2023; Chen and Yang, 2020).
+2.5 PRIVACY AND ETHICAL CONSIDERATIONS
+While AI and computer vision technologies offer significant advantages, they also introduce concerns related to privacy and data security. Many existing systems rely on cloud-based video processing, where user data is transmitted and stored on remote servers.
+This raises concerns regarding unauthorized access, data misuse, and user discomfort, particularly in home environments. Studies in digital health emphasize the importance of privacy-preserving systems that minimize data exposure and ensure user control over personal information.
+Approaches that perform computation locally on the user’s device, often referred to as edge computing, are gaining importance in addressing these concerns. By processing data locally and transmitting only minimal metadata, such systems can provide advanced functionality while maintaining user privacy.
+2.6 IDENTIFIED RESEARCH GAPS
+Based on the analysis of existing systems and research literature, the following gaps are identified:
+● Lack of integration between dynamic AI-based workout generation and real-time feedback
+● Limited availability of accurate biomechanical analysis in consumer fitness applications
+● Insufficient focus on privacy-preserving fitness systems
+● Absence of continuous feedback loops for adaptive personalization
+Bloomfit addresses these gaps by combining AI-driven personalization, real-time biomechanical analysis, and a privacy-first architecture into a unified and scalable system.
+3. TOPIC OF THE WORK (PROPOSED SYSTEM)
+3.1 SYSTEM DESIGN / ARCHITECTURE
+The BloomFit system is designed as a cloud-native, AI-driven fitness platform that integrates a mobile application, real-time motion capture system, and serverless backend services. The architecture follows a modular, client-server model with emphasis on scalability, real-time communication, and efficient data synchronization.
+The overall system architecture is illustrated in Fig. 1.
+Figure 1. BloomFit System Architecture
+This diagram illustrates the interaction between the Flutter Mobile Application, Firebase services, AI modules, and the React-based Web Companion. It shows how user data, workout pathways, and real-time feedback are synchronized through Firestore, while MediaPipe-based pose estimation enables real-time motion analysis. The architecture also includes AI-based workout generation and adaptation through integration with generative models.
+Key Architectural Layers
+The system is organized into the following layers:
+I. Presentation Layer (Flutter Mobile Application)
+Acts as the primary user interface for interaction
+Built using cross-platform Flutter framework
+Responsible for:
+UI rendering and navigation
+Capturing user inputs (goals, feedback, preferences)
+Displaying AI-generated workout pathways
+Implements Riverpod-based state management for:
+predictable state updates
+unidirectional data flow
+Generates a pairing code to establish real-time session with motion capture module
+II. Application Logic Layer (Client-Side Services)
+Encapsulates core business logic within the mobile application
+Key components:
+Path Generation Service
+Interfaces with AI module
+Generates structured workout plans
+Health Connect Service
+Handles optional health data integration
+Repositories / Data Access Layer
+Manages communication with Firebase services
+Ensures separation between:
+UI logic
+data handling
+Maintains immutable application state for consistency
+III. Cloud & Backend Layer (Firebase + AI Integration)
+Implemented using Firebase serverless architecture
+Core services:
+Firebase Authentication
+Secure user identity management
+Cloud Firestore
+NoSQL database for:
+user profiles
+workout history
+live session data
+Supports:
+real-time listeners
+low-latency synchronization
+AI Integration:
+Generative AI module processes:
+user inputs
+performance data
+feedback signals
+Produces:
+personalized workout pathways
+adaptive updates
+IV.  Motion Capture & Analysis Layer (Web Companion)
+Implemented as a React-based web application
+Uses MediaPipe Pose Estimation for:
+real-time skeletal landmark detection
+Processing steps:
+capture video stream
+extract body keypoints
+compute joint angles using vector-based (dot product) calculations
+Implements:
+finite-state machine (FSM) for repetition detection
+threshold-based movement validation
+Outputs:
+repetition count
+posture accuracy
+feedback signals
+System Communication Model
+Follows a real-time, event-driven architecture
+Communication enabled via:
+Firestore live session documents
+Workflow:
+mobile app sends workout instructions
+web companion streams feedback
+backend synchronizes all updates
+Scalability & Extensibility
+Serverless backend ensures:
+horizontal scalability
+minimal infrastructure overhead
+Modular design supports:
+wearable integration
+advanced analytics
+enhanced AI models
+Key Architectural Advantages
+Real-time feedback with low latency
+Adaptive and personalized workout generation
+Privacy-first computation model
+Scalable and modular system design
+The architecture enables seamless integration between user interaction, real-time motion analysis, and AI-driven adaptation, forming a cohesive and intelligent fitness ecosystem.
+3.2 WORKING PRINCIPLE
+The working principle of BloomFit is based on the coordinated interaction between the mobile application, cloud backend, AI modules, and the motion capture system. The system operates as a continuous pipeline that integrates user input, real-time processing, and adaptive feedback to deliver a personalized fitness experience. Each component in the system contributes to a closed-loop workflow where data is continuously collected, processed, and utilized to refine future interactions and recommendations.
+The process begins with user authentication and onboarding, where the user logs in through Firebase Authentication. Upon successful authentication, a secure session is established and the user profile is retrieved from Cloud Firestore. This profile contains essential information such as fitness goals, workout history, preferences, and previous performance data. This data acts as the foundation for personalization, enabling the system to generate workouts that are aligned with the user’s capabilities and objectives.
+Once the profile data is available, the system activates the AI-based workout generation module, which creates a structured workout plan consisting of exercises, repetitions, sets, and progression logic. The generated plan follows standard fitness principles such as balanced muscle targeting, recovery considerations, and gradual progression. The system ensures that the workout remains adaptable by incorporating user-specific constraints such as available equipment, time limitations, and physical conditions.
+The frontend of the application follows a structured and unidirectional data flow model, as illustrated in Figure 2. User interactions, such as selecting a workout or modifying preferences, trigger state updates through a centralized logic layer. This layer communicates with data repositories to fetch or update information from Firestore. The retrieved data is processed and stored in an immutable state, which ensures consistency and predictability in application behavior.
+This architecture ensures that any change in data automatically triggers a UI update, allowing the interface to remain synchronized with backend operations. It also minimizes inconsistencies and improves performance by maintaining a clear separation between data handling and presentation logic. As a result, the user experiences a smooth and responsive interface, even during real-time updates.
+Figure 2. Frontend Data Flow (Riverpod)
+This diagram represents the unidirectional data flow within the mobile application. User actions trigger a Riverpod-based state management system, which interacts with data repositories to fetch information from Firestore. The updated data is stored in an immutable state, causing UI components to rebuild and reflect the latest application state.
+When a workout session is initiated, the system establishes a connection between the mobile application and the web companion using a pairing code mechanism. This pairing process creates a unique live session document in Firestore, which acts as a shared communication channel between the two components. Through this session, both the mobile application and the motion capture module remain synchronized in real time, enabling continuous data exchange during the workout.
+The user performs exercises in front of the camera, and the motion capture module processes the video feed using MediaPipe pose estimation. The system detects key skeletal landmarks corresponding to major joints such as shoulders, elbows, hips, and knees. Using these landmarks, joint angles and relative positions are computed to track body movement and posture throughout the exercise.
+Based on this processed data, the system performs real-time movement analysis. Each exercise is associated with predefined movement patterns and threshold values, which define the correct range of motion. The system continuously compares the user’s movement against these thresholds to determine whether a repetition is valid. In addition to repetition counting, the system also identifies deviations in posture, such as incorrect joint alignment or incomplete motion.
+The accuracy evaluation mechanism ensures that only correctly performed repetitions are counted, improving the reliability of performance tracking. When an incorrect form is detected, the system generates immediate feedback in the form of correction cues or indicators. This feedback is transmitted to the mobile application as lightweight metadata, such as repetition count updates and error flags, ensuring low latency and efficient communication without transmitting raw video data.
+The mobile application reflects this feedback in real time, allowing the user to adjust their posture and improve execution during the workout itself. This immediate feedback loop enhances both safety and effectiveness, reducing the risk of injury and promoting correct exercise habits.
+After completing the workout, the system collects performance-related inputs such as Rate of Perceived Exertion (RPE), skipped exercises, and any discomfort experienced by the user. These inputs provide subjective insights into the user’s experience and are stored in Firestore along with objective performance data.
+The adaptive feedback mechanism is illustrated in Figure 3, which represents the AI-driven feedback loop responsible for modifying future workouts. The collected data is analyzed by the AI module to evaluate whether the workout intensity and structure were appropriate. Based on this analysis, the system dynamically adjusts future workout plans by either reducing intensity, modifying exercises, or applying progressive overload.
+This combination of real-time evaluation and post-workout adaptation enables BloomFit to function as an intelligent and responsive system that continuously evolves based on user performance and feedback.
+Figure 3. AI Feedback Loop Logic
+This diagram illustrates how post-workout feedback, including RPE and pain data, is processed by the AI module. Based on the analysis, the system determines whether the workout intensity was appropriate. If the user experiences high exertion, the system reduces intensity or generates an easier variation. If the workout is completed comfortably, progressive overload is applied to enhance performance. The updated workout plan is then stored and reflected in the user’s pathway.
+This feedback loop enables the system to continuously adapt and improve workout recommendations, ensuring both safety and effectiveness. By combining objective performance data, such as repetition accuracy and completion rate, with subjective inputs like RPE and discomfort levels, the system develops a more comprehensive understanding of the user’s physical condition. The updated workout pathway is then synchronized with the mobile application through Firestore, ensuring that all modifications are reflected instantly in the user interface. This completes the cycle of input, processing, and adaptation, forming a closed-loop system that evolves over time.
+The adaptive nature of this system allows it to respond dynamically to user performance. For instance, consistent high exertion or repeated errors in form may result in reduced intensity or alternative exercise selection, while stable performance and low exertion may trigger progressive overload to enhance fitness gains. This ensures that workouts remain both challenging and safe, tailored to the user’s evolving capabilities.
+Through the integration of structured data flow, real-time motion analysis, and AI-driven feedback, BloomFit functions as an intelligent and evolving fitness system. The system continuously learns from user behavior, performance trends, and feedback patterns to refine its recommendations. Over time, this results in increasingly personalized workout experiences that optimize effectiveness, improve adherence, and promote long-term fitness consistency.
+3.3 AI-BASED WORKOUT GENERATION
+The AI-based workout generation module is a core component of the BloomFit system, responsible for creating personalized, adaptive, and context-aware workout pathways. Unlike traditional fitness applications that rely on static templates or predefined routines, BloomFit utilizes a generative AI approach to dynamically construct workout plans based on individual user data.
+The process begins with the collection of user-specific inputs during onboarding and subsequent usage. These inputs include fitness goals, experience level, available equipment, workout preferences, and historical performance data. This information is structured and passed to the AI engine through the Path Generation Service, which acts as an intermediary between the mobile application and the backend AI module.
+The AI engine processes these inputs to generate a multi-day workout pathway, consisting of structured sessions that include exercises, sets, repetitions, and rest intervals. The generated plan follows established fitness principles such as balanced muscle group targeting, recovery cycles, and progressive overload. This ensures that the workout is not only personalized but also scientifically structured.
+A key feature of this module is its ability to perform dynamic adaptation. Unlike rule-based systems that follow fixed logic, the generative model can modify workout plans based on real-time feedback and historical trends. For example, if a user consistently reports high exertion or skips certain exercises, the system adjusts future sessions by reducing intensity, modifying exercises, or redistributing workload.
+The system also supports context-aware modifications, allowing users to request changes in real time. Through the conversational AI interface, users can modify workouts based on immediate constraints such as time availability, fatigue, or equipment limitations. The AI interprets these inputs and generates updated workout structures accordingly.
+To ensure consistency and usability, the generated output is structured in a standardized format (e.g., JSON), which allows seamless integration with the mobile application. This structured output enables the frontend to render workout pathways clearly while maintaining flexibility for updates and modifications.
+In addition to initial generation, the AI module continuously refines its outputs using the feedback loop mechanism described in Section 3.2. Performance metrics such as repetition accuracy, completion rate, and user feedback (RPE and discomfort) are analyzed to improve future recommendations. This allows the system to evolve from a static planner into an adaptive digital trainer.
+The integration of generative AI enables BloomFit to deliver highly personalized and evolving workout experiences. By combining user-specific data, real-time feedback, and adaptive logic, the system ensures that each workout remains relevant, effective, and aligned with the user’s progress.
+Overall, the AI-based workout generation module transforms BloomFit into an intelligent system capable of providing customized fitness guidance that adapts continuously to user needs and performance.
+3.4 REAL-TIME ACCURACY AND POSE ESTIMATION
+The real-time accuracy and pose estimation module is a critical component of the BloomFit system, responsible for evaluating exercise performance and ensuring correct movement execution. This module enables the system to provide immediate feedback to users, reducing dependency on human trainers and improving workout safety and effectiveness.
+The system utilizes MediaPipe pose estimation to detect human body landmarks from the camera feed. MediaPipe identifies a set of key skeletal points corresponding to major joints such as the shoulders, elbows, hips, knees, and ankles. These landmarks are tracked in real time, forming the basis for motion analysis.
+Using the detected landmarks, the system performs joint angle calculations to evaluate posture and movement. Angles between connected joints are computed using vector-based methods, allowing the system to determine the range of motion during each exercise. For example, in exercises such as squats or arm curls, specific joint angles define the correct execution of a movement.
+Each exercise is associated with predefined movement thresholds, which define the acceptable range of motion for a valid repetition. These thresholds are derived based on standard exercise biomechanics and ensure that only properly executed movements are counted. The system continuously compares the user’s movement against these thresholds to detect transitions between different phases of an exercise.
+The system implements a state-based repetition detection mechanism, where each exercise is divided into stages such as starting position, mid-movement, and completion. A repetition is counted only when the user successfully transitions through all required stages while maintaining correct form. This approach minimizes false positives and improves the accuracy of repetition counting.
+In addition to repetition detection, the system performs real-time accuracy evaluation by analyzing deviations in posture. If the user performs an exercise with incorrect alignment or insufficient range of motion, the system identifies the error and generates corrective feedback. This feedback is communicated to the mobile application in real time, allowing the user to adjust their posture immediately.
+To ensure efficiency, all motion analysis is performed locally on the user’s device within the web companion. This eliminates the need to transmit video data to the cloud, significantly reducing latency and preserving user privacy. Only processed metadata, such as repetition counts and feedback signals, is transmitted to the backend.
+The system is designed to operate under real-time constraints, ensuring that feedback is delivered with minimal delay. This is essential for maintaining a smooth user experience and enabling immediate correction during exercise execution.
+Overall, the integration of pose estimation, joint angle analysis, and state-based repetition detection enables BloomFit to provide accurate, real-time feedback. This transforms the system into an intelligent fitness assistant capable of guiding users through exercises with precision and reliability.
+3.5 RESULTS AND DISCUSSION
+The BloomFit system was successfully designed and implemented as an integrated fitness platform combining AI-driven workout generation, real-time motion analysis, and adaptive feedback mechanisms. The system demonstrates the feasibility of delivering personalized and interactive fitness guidance without the need for physical trainers.
+One of the key outcomes of the system is the ability to generate personalized workout pathways based on user-specific inputs. The AI module effectively creates structured workout plans that adapt to user goals, experience level, and feedback. This ensures that users receive tailored recommendations rather than generic, template-based routines.
+The integration of the motion capture module enables real-time exercise evaluation, allowing users to receive immediate feedback on their performance. The use of pose estimation and joint-angle analysis ensures that only correctly performed repetitions are counted, improving the accuracy of performance tracking and reducing the risk of injury.
+The overall system capabilities and performance characteristics are summarized in Table 1.
+Table 1: System Performance Overview
+Another significant outcome is the implementation of a continuous feedback loop, where user inputs such as Rate of Perceived Exertion (RPE), skipped exercises, and discomfort levels are analyzed to refine future workout plans. This adaptive mechanism allows the system to evolve dynamically based on user performance.
+The system’s adaptive behavior based on user feedback is illustrated in Table 2.
+Table 2. Adaptive Response Based on User Feedback
+The system also demonstrates efficient real-time synchronization between the mobile application and the web companion. Firestore live sessions enable seamless communication, ensuring that repetition counts and feedback are updated instantly on the user interface.
+In terms of performance, the system maintains low latency by performing motion analysis locally on the user’s device and transmitting only lightweight metadata. This design improves responsiveness while ensuring privacy preservation, as no video data is stored or transmitted to the cloud.
+Overall, the results demonstrate that BloomFit effectively addresses key challenges in digital fitness applications, including lack of personalization, absence of real-time feedback, and privacy concerns. The system provides a practical and scalable solution that improves accessibility, safety, and user engagement in home-based fitness environments.
+The discussion highlights that combining AI-driven personalization with real-time biomechanical analysis creates a more effective and interactive fitness experience. The system continuously adapts to user performance, making it suitable for long-term fitness tracking and improvement.
+3.5.1 APPLICATION INTERFACE
+The BloomFit application provides an intuitive and interactive interface that enables users to perform workouts, receive real-time feedback, and interact dynamically with the system. The interface is designed to be user-friendly while supporting all core functionalities of the platform, including workout execution, performance tracking, and adaptive feedback.
+Figure 4: BloomFit Onboarding and Goal Selection Interface  
+The figure illustrates the initial user onboarding screens of the BloomFit application. The welcome screen introduces the platform as an AI-based fitness companion, while the goal selection screen allows users to select their primary fitness objective, such as weight loss, muscle building, or general fitness. These inputs are used by the system to personalize workout generation and tailor recommendations according to user preferences.
+Figure 5. BloomFit Application Interface  
+The figure illustrates key screens of the BloomFit mobile application, including the workout instruction interface, workout overview screen, and real-time exercise execution view. The workout instruction screen provides guidance on how to perform exercises correctly. The overview screen displays the structured workout plan with exercises, duration, and sets. The execution screen shows real-time repetition tracking and exercise details, enabling users to monitor their performance and interact with the system during workouts.
+Figure 6: User Interaction and Post-Workout Feedback Interface  
+The figure illustrates key interaction and feedback components of the BloomFit application. It includes the pause workout interface, which allows users to resume or terminate a session, and the skip exercise interface, where users can specify reasons such as fatigue, difficulty, or injury. Additionally, the post-workout feedback screen captures user inputs such as workout intensity (RPE) and breathing levels. These inputs are utilized by the system to adapt future workout plans, ensuring personalized and safe fitness progression.
+4. INDIVIDUAL CONTRIBUTIONS
+1. Arya Mitesh Jain (23BCE10217) 
+Arya was responsible for backend development and cloud infrastructure using Firebase. He worked on designing and implementing the data architecture required to support user management and real-time system communication.
+He configured Firebase Authentication to enable secure user login and session handling. Additionally, he designed the Cloud Firestore database structure, organizing collections for user profiles, workout pathways, and performance data.
+Arya also implemented real-time data synchronization using Firestore listeners, enabling seamless communication between the mobile application and the motion analysis module. His work ensured efficient data flow and system consistency.
+His contribution formed a strong backend foundation that supports the real-time and scalable nature of the BloomFit system.
+2. Kajal Mehta (23BCE10234) 
+Kajal was responsible for the design and implementation of the user interface and overall user experience of the BloomFit mobile application. She worked on creating visually consistent and intuitive UI components across multiple screens, including onboarding, workout selection, execution interface, and feedback screens.
+She focused on designing layouts, color schemes, and interaction flows that enhance usability and user engagement. Kajal also contributed to structuring the navigation system and ensuring a smooth transition between different modules of the application.
+Additionally, she worked on refining UI elements such as buttons, cards, and instructional layouts to ensure clarity and accessibility. Her contribution ensured that the application maintains a clean, modern, and user-friendly interface while effectively presenting complex system functionality.
+3. Varda Joshi (23BCE10345) 
+Varda was responsible for implementing the exercise evaluation and repetition counting system using computer vision techniques. She developed the logic required to detect valid repetitions based on pose estimation data.
+Her work involved analyzing skeletal landmark data, defining movement thresholds, and identifying different phases of an exercise. She contributed to building a rule-based system that determines whether a repetition is correctly performed.
+Varda also worked with OpenCV and related tools to enhance motion tracking and improve detection accuracy. She ensured that the system could reliably evaluate user movements and provide meaningful feedback.
+Her contribution was essential in enabling accurate real-time exercise tracking and improving the reliability of the BloomFit system.
+4. Anushree Chatterjee (23BCE11160) 
+Anushree contributed to the development of the Flutter-based mobile application, focusing on frontend implementation and system integration. She worked on building key application screens and ensuring proper interaction between the user interface and backend services.
+She implemented state management using Riverpod to maintain a structured and unidirectional data flow within the application. This ensured consistency between application state and UI updates, especially during real-time interactions.
+Anushree also handled integration with Firebase services, including retrieving workout data, updating user progress, and reflecting real-time feedback from the motion analysis module. Her work ensured seamless communication between frontend and backend components.
+Her contribution played a key role in delivering a responsive and dynamic user experience within the BloomFit application.
+5. Rajveer Baweja (23MIP10110) 
+Rajveer contributed to backend integration and system connectivity, focusing on ensuring seamless communication between different components of the BloomFit system. He worked alongside the backend team to implement Firebase-based data handling and synchronization mechanisms.
+He played a key role in managing Firestore operations, including reading and writing workout data, handling live session updates, and ensuring data consistency across the system. He also assisted in integrating backend services with the mobile application.
+Additionally, Rajveer contributed to optimizing real-time communication between the mobile application and the web companion, ensuring that updates such as repetition counts and feedback signals are reflected instantly.
+His work ensured reliable backend integration and smooth interaction between system components.
+6. Amaan Syed (23MIP10116)
+Amaan served as the core system developer and technical lead for the BloomFit platform, contributing across multiple components including backend architecture, AI integration, and real-time processing pipelines. He was responsible for designing the overall system flow and ensuring seamless interaction between the mobile application, cloud services, and the motion analysis module.
+He implemented the motion analysis pipeline using MediaPipe, including skeletal landmark detection and joint-angle computation using vector-based (dot product) methods. He also designed a finite-state machine for accurate repetition detection, ensuring that only correctly performed movements were counted.
+In addition, Amaan contributed to the integration of AI-based workout generation by managing communication between the frontend and generative AI modules. He also worked on optimizing real-time performance using Firestore live sessions, ensuring low-latency synchronization between components.
+His contribution was critical in transforming BloomFit into a fully functional, real-time, AI-driven fitness system.
+5. CONCLUSION
+The BloomFit system successfully demonstrates the integration of artificial intelligence, real-time motion analysis, and cloud-based technologies to create a personalized and adaptive fitness platform. The project addresses key limitations of existing fitness solutions, including lack of personalization, absence of real-time feedback, and accessibility constraints.
+By combining generative AI for workout planning with MediaPipe-based pose estimation for exercise evaluation, the system is able to provide users with structured workout pathways and immediate performance feedback. The implementation of a real-time, event-driven architecture using Firebase ensures seamless communication between system components, enabling a responsive and interactive user experience.
+A significant contribution of this project is the development of a closed-loop feedback system, where user inputs such as performance metrics and perceived exertion are continuously analyzed to refine future workout recommendations. This allows the system to adapt dynamically to individual user needs, improving both effectiveness and safety.
+The modular design of the system ensures scalability and extensibility, allowing future enhancements such as wearable integration, advanced analytics, and improved AI models. Additionally, the privacy-first approach, where all motion analysis is performed locally, ensures secure handling of user data.
+Overall, BloomFit demonstrates the potential of combining AI-driven personalization with real-time biomechanical analysis to create an intelligent fitness assistant. The system provides an accessible, efficient, and scalable solution for guided home workouts, contributing toward improved health and fitness accessibility.
+Future work may focus on enhancing model accuracy, incorporating additional biometric inputs, and expanding the system to support a wider range of exercises and user profiles.
+6. REFERENCES
+Zhou M, Mintz Y, Fukuoka Y, Goldberg K, Flowers E, Kaminsky P, Castillejo A, Aswani A (2018) Personalizing mobile fitness apps using reinforcement learning. CEUR Workshop Proceedings 2068.
+Li C (2024) Designing a personalization intervention to reduce churn in exercise mobile apps: a research proposal.
+Monteiro-Guerra F, Rivera-Romero O, Fernandez-Luque L, Caulfield B (2019) Personalization in real-time physical activity coaching using mobile applications: a scoping review. IEEE J Biomed Health Inform 24(6):1738–1751.
+Supanich W, Kulkarineetham S, Sukphokha P, Wisarnsart P (2023) Machine learning-based exercise posture recognition system using MediaPipe pose estimation framework. Proc ICACCS, pp 2003–2007.
+Simoes W, Reis L, Araujo C, Maia Jr J (2024) Accuracy assessment of 2D pose estimation with MediaPipe for physiotherapy exercises. Procedia Comput Sci 251:446–453.
+Ram BG, Murgod TR, Chandan H, Kumar DS (2024) Real-time exercise assessment: MediaPipe & OpenCV approach. CRC Press, pp 676–685.
+Agarwal S, Gupta M, Khandelwal S, Jain P, Aggarwal A, Singh D, Mishra VK (2021) FitMe: a fitness application for accurate pose estimation using deep learning. Proc ICSCCC, pp 232–237.
+Raza A, Qadri AM, Akhtar I, Samee NA, Alabdulhafith M (2023) LogRF: human pose estimation using skeleton landmarks for physiotherapy correction. IEEE Access 11:107930–107939.
+Chen S, Yang RR (2020) Pose trainer: correcting exercise posture using pose estimation. arXiv:2006.11718.
+Cao Z, Hidalgo G, Simon T, Wei SE, Sheikh Y (2017) OpenPose: realtime multi-person 2D pose estimation. IEEE TPAMI.
+Lugaresi C, Tang J, Nash H et al. (2019) MediaPipe: a framework for building perception pipelines. arXiv:1906.08172.
+Shotton J, Fitzgibbon A, Cook M et al. (2011) Real-time human pose recognition in parts from single depth images. CVPR.
+He K, Zhang X, Ren S, Sun J (2016) Deep residual learning for image recognition. CVPR.
+Simonyan K, Zisserman A (2015) Very deep convolutional networks. ICLR.
+Goodfellow I, Bengio Y, Courville A (2016) Deep learning. MIT Press.
+LeCun Y, Bengio Y, Hinton G (2015) Deep learning. Nature 521:436–444.
+Sutton RS, Barto AG (2018) Reinforcement learning: an introduction. MIT Press.
+Silver D et al. (2016) Mastering the game of Go. Nature.
+Esteva A et al. (2017) Dermatologist-level classification using deep learning. Nature.
+Mathis A et al. (2018) DeepLabCut: markerless pose estimation. Nat Neurosci.
+Khan SS, Hoey J (2017) Review of fall detection techniques. IEEE Rev Biomed Eng.
+Zhang Z (2012) Microsoft Kinect sensor and its effect. IEEE MultiMedia.
+Redmon J, Farhadi A (2018) YOLOv3: an incremental improvement. arXiv:1804.02767.
+Howard AG et al. (2017) MobileNets: efficient CNNs for mobile vision. arXiv:1704.04861.
+Tan M, Le Q (2019) EfficientNet: model scaling for CNNs. ICML.
+Kingma DP, Ba J (2015) Adam: stochastic optimization method. ICLR.
+Abadi M et al. (2016) TensorFlow: large-scale ML system.
+Paszke A et al. (2019) PyTorch: deep learning library. NeurIPS.
+Firebase (2023) Firebase documentation. Google. https://firebase.google.com/docs
+Google (2024) MediaPipe Pose documentation. https://developers.google.com/mediapipe
+Flutter (2024) Flutter documentation. https://docs.flutter.dev
+7. PUBLICATION / CONFERENCE / PATENT
+The present work has not been submitted for publication, conference presentation, or patent filing at this stage. However, the project has the potential to be extended for future research publication and conference submission.
+8. BIODATA
+Arya Mitesh Jain | 23BCE10217                                                    
+Full Stack Developer | Python Developer
+Professional Summary
+Arya Jain is a pre-final year Computer Science student at VIT Bhopal, passionate about building intuitive and efficient web applications. She has a strong foundation in Python, HTML, CSS, and JavaScript, and is actively expanding her skills in modern web development tools and frameworks.
+Arya enjoys working on hands-on projects, collaborating with peers, and exploring new technologies that strengthen her problem-solving abilities. She is eager to take on internship opportunities where she can apply her technical skills, gain real-world development experience, and grow into a capable front-end or full-stack developer. 
+Experience
+Ex-intern at TCS iON   
+Technical Skills
+Languages / Technologies: Python, HTML, CSS, JavaScript, (likely other web dev languages — based on interest in web apps)
+
+Domains: Web development, Front-end / Web apps
+Tools & Platforms
+Git/GitHub
+Kajal Mehta | 23BCE10234
+Junior Associate Developer Intern at Calanjiyam Consultancies
+ and Technologies
+Professional Summary
+Kajal Mehta is a Computer Science student and developer passionate about building reliable software. Currently working as a Junior Associate Developer Intern, She has practical experience in designing backend logic and system architecture. She is also an active open-source contributor, having ranked 81st globally in GSSOC '24. Her technical strengths lie in Web and API Development using Spring Boot, Java, Python, and JavaScript and is always eager to tackle challenging projects that push my coding skills further.
+Experience
+Junior Associate Developer Intern at Calanjiyam Consultancies and Technologies
+Collaborating with the IT department on real-world projects.
+Designing robust system architectures and implementing complex backend logic.
+Technical Skills
+Languages & Frameworks
+Core: Java, Python, JavaScript, HTML, CSS, React
+Frameworks: Spring Boot
+Database: MySQL
+Tools & Platforms
+Git/GitHub
+Postman
+Varda Joshi | 23BCE10345
+Full Stack Developer (Frontend-Focused) | Python Developer
+Professional Summary
+Varda Joshi is a Computer Science student at VIT Bhopal specializing in Full Stack Development and Python-based system design. She builds interactive, user-centric web applications with strong proficiency in React.js, Node.js, and database integration. She has hands-on experience creating real-time systems and automating workflows using Python and MySQL.
+Experience
+Web Development Intern — IISPPR
+ May 2025 – Aug 2025
+Developed and optimized MERN-stack applications, enhancing usability and performance.
+Technical Skills
+Core: Full Stack Development, System Automation, Web Architecture 
+Stack: React.js, Node.js, Express.js, Python, MongoDB, MySQL, Tailwind CS
+Tools: OpenCV, Git, VS Code, Postman, Figma
+Anushree Chatterjee | 23BCE11160
+Full Stack Developer
+Professional Summary
+Anushree Chatterjee is a Computer Science student at VIT Bhopal, specializing in Data Intelligence and Full Stack Development. She excels at building real-time systems and AI-integrated applications, with practical experience in the MERN stack and Python-based data engineering.
+Experience
+Full Stack Intern at TheSmartBridge
+Developed responsive MERN stack applications with optimized API performance.
+Technical Skills
+Core: Data Intelligence, Full-Stack Dev, AI Systems, Analytics
+Stack: React.js, Node.js, Flutter, Python, MongoDB, Firebase
+Tools: OpenCV, MediaPipe, IBM watsonx, Git, AWS
+Rajveer Baweja | 23MIP10110
+AI Engineer & Full Stack Developer
+Professional Summary
+Rajveer Baweja is a Computer Science and Data Sciences student at VIT Bhopal with a strong technical foundation in AI systems, backend engineering, and cross-platform application development. He specializes in building intelligent, user-centric applications powered by machine learning, cloud services, and real-time data processing. Rajveer has hands-on experience in Python-based AI/ML workflows, REST API development, and scalable mobile frontends using Flutter.
+Experience
+AI & App Development Intern
+ Worked on AI-assisted application modules and backend automation pipelines.
+Developed ML-powered features using Python, OpenCV, and MediaPipe.
+
+Built cross-platform app interfaces using Flutter and integrated real-time APIs.
+
+Contributed to backend optimization and cloud deployment workflows.
+
+Technical Skills
+Core: Artificial Intelligence, Machine Learning, Full-Stack Development, Cloud Systems, Algorithmic Problem Solving
+ Languages/Stack: Python, C++, Java, Flutter, Node.js, Express.js, Firebase, MongoDB
+ AI Tools & Libraries: MediaPipe, OpenCV, NumPy, Scikit-learn, TensorFlow Lite
+ Cloud & DevOps: AWS, Google Cloud, Linux, Git, CI/CD workflows
+ Additional Expertise: Data Structures, OOP, System Design, UI/UX Integration
+Amaan Syed | 23MIP10116
+Software Engineer
+Professional Summary
+Amaan Syed is a Software Engineer Intern at VideoDB, specializing in AI systems and full-stack development. He focuses on building AI-augmented applications and end-to-end user experiences, delivering practical software solutions with clean interfaces. Amaan has experience with React, TypeScript, Kotlin, Android, and Node.js, and is actively developing skills in AI technologies and software development through his projects.
+Experience
+Software Engineer Intern at VideoDB
+Building AI-augmented applications and end-to-end user experiences.
+Focuses on delivering practical software solutions with clean interfaces and dedication to quality results.
+Technical Skills
+Specializations: AI Systems, Agents, Python based AI tools, Full-Stack Development, App Development, UI/UX, APIs
+Frontend: React, Next, TypeScript
+Backend: Node.js, Python Development
+Mobile: Kotlin, Android, Flutter
+AI/ML: Agents, RAG, Pipelines, CNN, Video Handling-Analysis-Processing, Computer Vision, Audio Analysis 

@@ -1,0 +1,57 @@
+KrishiBot: Smart Farming Bot with Crop Disease Detection and Recommendation System
+An
+DSN3099: Engineering Project in Community Services
+Phase-2 Individual Report
+(EPICS Group No. 268)
+Submitted By:
+SHRIVARDHAN SHARMA
+(22BEC10011)
+Submitted in partial fulfillment for the award of the degree of
+Bachelor of Electronics and Communication Engineering
+VIT BHOPAL UNIVERSITY
+BHOPAL, MADHYA PRADESH – 466114
+Under the Supervision of:
+Dr. Sangram K. Das (100513)
+April-2025 
+VIT BHOPAL UNIVERSITY, BHOPAL (M.P.) – 466114
+Bonafide Certificate
+This Certified that this project report titled “KrishiBot: Smart Farming Bot with Crop Disease Detection and Recommendation System” is the Bonafide work of ShriVardhan Sharma (22BEC10011) and he carried out the project work under my supervision as the Guide. This Project Report (Phase-2) is submitted for the Project Phase-2 Examination of DSN3099: Engineering Project in Community Services. 
+ShriVardhan Sharma (22BEC10011)
+Supervisor (Dr. Sangram K. Das, Asst. Prof. – SEEE)
+Table of Contents
+Introduction To KrishiBot
+The KrishiBot project was a multidisciplinary initiative aimed at building a smart, IoT-enabled agricultural robot capable of autonomous irrigation, nutrient delivery, environmental monitoring, and disease diagnosis using AI and Computer Vision. As a core member of the development team, I, ShriVardhan Sharma, contributed extensively to the hardware integration, sensor calibration, Wi-Fi communication, microcontroller coding, and mechanical design and construction of the bot.
+My role focused primarily on interfacing key sensors with the Arduino and NodeMCU, establishing real-time data communication, and developing a reliable robot structure suitable for Indian farmland terrain. I also coordinated with various teammates to ensure seamless integration of embedded systems with machine learning models and web dashboards.
+This report details my contributions in the domains of electronics design, wireless architecture, software programming, prototype building, testing, and system optimization, supported with observations, results, and learning outcomes.
+Sensor Integration and Hardware Interface
+One of my primary responsibilities was to interface environmental sensors with the Arduino UNO microcontroller and ensure their reliable performance across variable field conditions.
+Soil Integration and Hardware Interface
+I began with integrating the capacitive soil moisture sensor. The sensor provided analog values corresponding to soil wetness, ranging from 0 (dry) to 1023 (fully wet). I programmed analog reading conversion functions in Arduino IDE to translate these values into percentage moisture. Through threshold testing, I configured automatic pump triggering below a set limit (e.g., 30%).
+Challenges included:
+Electrical noise and fluctuating values.
+Calibration in different soil types.
+Protecting the sensor from corrosion (achieved using waterproof casing).
+TDS Sensor Integration
+The TDS sensor required significant preprocessing to ensure accurate readings. I researched calibration formulas and used standard TDS solutions to calibrate the sensor against known ppm values. I also added serial data logging to observe readings under various fertilization conditions.
+Temperature Sensor (LM35)
+LM35 provided ambient temperature in analog voltage. I programmed linear conversion logic (10mV/°C) to obtain accurate temperature values. The sensor helped build a real-time microclimate profile, critical for AI crop prediction and disease outbreak analysis.
+Relay and Pump Control
+I implemented 5V relay modules to control:
+12V water pump
+Nutrient dosing pump
+Based on sensor input, the Arduino controlled these relays, activating pumps for irrigation and fertilization as needed.
+NodeMCU ESP8266: Wireless IoT Integration
+Another significant contribution was wireless communication using NodeMCU, allowing KrishiBot to send real-time sensor data to the cloud and receive control commands remotely.
+Serial Communication Protocol
+I established UART communication between the Arduino UNO and NodeMCU. I formatted and transmitted sensor data using structured strings (e.g., “M:45 T:32 D:320”) that the NodeMCU parsed and pushed to the cloud via HTTP requests.
+WiFi Setup and Cloud Integration
+I configured NodeMCU to:
+Connect to Wi-Fi using ESP8266WiFi.h
+Transmit data to Firebase using FirebaseESP8266.h
+Push data to Blynk for live monitoring
+I also enabled NodeMCU to receive user inputs (e.g., manual pump ON/OFF), parsed them, and forwarded commands to the Arduino.
+Handling Failures
+To handle network drops, I wrote auto-reconnect logic, added watchdog timers, and implemented serial error logs.
+Summary
+In conclusion, my contributions to KrishiBot have been central to developing a real-time, responsive, and autonomous agricultural robot capable of solving key problems faced by modern farmers. I was responsible for designing and building the bot’s hardware architecture, programming sensor interaction, configuring wireless communication, and ensuring field-readiness of the system.
+KrishiBot not only demonstrated my engineering proficiency but also my commitment to sustainable innovation. The project allowed me to convert classroom knowledge into a real solution for real problems. It was a collaborative and transformative journey that taught me resilience, adaptability, and interdisciplinary thinking.
